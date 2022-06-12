@@ -14,8 +14,38 @@ import (
 )
 
 type Pod struct {
+	Name            string
+	Status          string
+	CreatedAt       string
+	Image           string
+	UniqueID        string
+	NodeName        string
+	IP              string
+	ContainersCount int
+	ContainersInfo  []Container
+	Labels          map[string]string
+}
+
+type Container struct {
+	Name            string
+	Image           string
+	ImagePullPolicy string
+	Container       int
+	Port            int
+}
+
+type Deployment struct {
 	Name   string
 	Status string
+}
+
+type Configmap struct {
+	Name string
+}
+
+type Service struct {
+	Name  string
+	Ports string
 }
 
 func Values(UserKubeconfig string) *kubernetes.Clientset {
@@ -37,7 +67,6 @@ func Values(UserKubeconfig string) *kubernetes.Clientset {
 			fmt.Printf("error %s, getting inclusterconfig" + err.Error())
 			log.Panic(err.Error())
 		}
-
 	} else {
 		log.Print("Successfully built config")
 	}
@@ -57,26 +86,124 @@ func Values(UserKubeconfig string) *kubernetes.Clientset {
 func Pods(AgentNamespace string) string {
 	// for Pods
 	clientset := Values("")
-	fmt.Printf("PODS \n")
+
+	if AgentNamespace == "" {
+		AgentNamespace = "default"
+	}
+
 	var podInfo []Pod
+	var containerInfo []Container
 	pods, err := clientset.CoreV1().Pods(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
 		log.Panic(err.Error())
 	} else {
 		for i := 0; i < len(pods.Items); i++ {
-			podInfo = append(podInfo, Pod{pods.Items[i].Name, string(pods.Items[i].Status.Phase)})
+
+			podInfo = append(podInfo,
+				Pod{Name: pods.Items[i].Name,
+					Status:          string(pods.Items[i].Status.Phase),
+					CreatedAt:       pods.Items[i].CreationTimestamp.String(),
+					UniqueID:        string(pods.Items[i].GetUID()),
+					NodeName:        string(pods.Items[i].Spec.NodeName),
+					ContainersCount: len(pods.Items[i].Spec.Containers),
+					Labels:          pods.Items[i].Labels,
+				})
+
+			for j := 0; j < len(pods.Items[i].Spec.Containers); j++ {
+				containerInfo = append(containerInfo,
+					Container{Name: pods.Items[i].Spec.Containers[j].Name,
+						Container:       j,
+						Image:           pods.Items[i].Spec.Containers[j].Image,
+						ImagePullPolicy: string(pods.Items[i].Spec.Containers[j].ImagePullPolicy),
+						Port:            int(pods.Items[i].Spec.Containers[j].Ports[0].ContainerPort),
+					})
+			}
+			podInfo[i].ContainersInfo = containerInfo
 		}
-		fmt.Printf("%v\n", podInfo)
+
 		pods_json, err := json.Marshal(podInfo)
-
 		if err != nil {
-
 			log.Fatal(err)
 		}
 
-		fmt.Println(string(pods_json))
-
 		return string(pods_json)
+	}
+	return "Error"
+}
+
+func Deployments(AgentNamespace string) string {
+	clientset := Values("")
+	if AgentNamespace == "" {
+		AgentNamespace = "default"
+	}
+
+	//fmt.Printf("DEPLOYMENTS \n")
+	var deploymentInfo []Deployment
+	deployments, err := clientset.AppsV1().Deployments(AgentNamespace).List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		log.Panic(err.Error())
+	} else {
+		for i := 0; i < len(deployments.Items); i++ {
+			deploymentInfo = append(deploymentInfo, Deployment{deployments.Items[i].Name, string(deployments.Items[i].Status.Conditions[0].Type)})
+		}
+
+		deployment_json, err := json.Marshal(deploymentInfo)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		return string(deployment_json)
+	}
+	return "Error"
+}
+
+func Configmaps(AgentNamespace string) string {
+	clientset := Values("")
+
+	if AgentNamespace == "" {
+		AgentNamespace = "default"
+	}
+
+	var configmapsInfo []Configmap
+	configmaps, err := clientset.CoreV1().ConfigMaps(AgentNamespace).List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		log.Panic(err.Error())
+	} else {
+		for i := 0; i < len(configmaps.Items); i++ {
+			configmapsInfo = append(configmapsInfo, Configmap{configmaps.Items[i].Name})
+		}
+
+		configmap_json, err := json.Marshal(configmapsInfo)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		return string(configmap_json)
+	}
+	return "Error"
+}
+
+func Services(AgentNamespace string) string {
+	clientset := Values("")
+
+	if AgentNamespace == "" {
+		AgentNamespace = "default"
+	}
+	var servicesInfo []Service
+
+	services, err := clientset.CoreV1().Services(AgentNamespace).List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		log.Panic(err.Error())
+	} else {
+		for i := 0; i < len(services.Items); i++ {
+			servicesInfo = append(servicesInfo, Service{Name: services.Items[i].Name, Ports: services.Items[i].Spec.Ports[0].TargetPort.String()})
+		}
+		service_json, err := json.Marshal(servicesInfo)
+		if err != nil {
+			log.Fatal(err)
+		}
+		//fmt.Println(string(pods_json))
+		return string(service_json)
 	}
 	return "Error"
 }

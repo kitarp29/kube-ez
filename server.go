@@ -35,9 +35,23 @@ func main() {
 
 	//route to get the Pods info in a namespace
 	e.GET("/pods", func(c echo.Context) error {
-		namespace := c.QueryParam("namepspace")
+		namespace := c.QueryParam("namespace")
+		return c.String(http.StatusOK, api.Pods(namespace))
+	})
 
-		return c.String(http.StatusOK, "Namespace!\n"+api.Pods(namespace))
+	e.GET("/deployments", func(c echo.Context) error {
+		namespace := c.QueryParam("namespace")
+		return c.String(http.StatusOK, api.Deployments(namespace))
+	})
+
+	e.GET("/configmaps", func(c echo.Context) error {
+		namespace := c.QueryParam("namespace")
+		return c.String(http.StatusOK, api.Configmaps(namespace))
+	})
+
+	e.GET("/services", func(c echo.Context) error {
+		namespace := c.QueryParam("namespace")
+		return c.String(http.StatusOK, api.Services(namespace))
 	})
 
 	// Run Server

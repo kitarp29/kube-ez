@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -17,7 +18,6 @@ type Pod struct {
 	Name            string
 	Status          string
 	CreatedAt       string
-	Image           string
 	UniqueID        string
 	NodeName        string
 	IP              string
@@ -31,7 +31,7 @@ type Container struct {
 	Image           string
 	ImagePullPolicy string
 	Container       int
-	Port            int
+	Port            []v1.ContainerPort
 }
 
 type Deployment struct {
@@ -70,10 +70,10 @@ func Values(UserKubeconfig string) *kubernetes.Clientset {
 	} else {
 		log.Print("Successfully built config")
 	}
-
 	// Create the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
+
 		log.Panic(err.Error())
 	} else {
 		log.Print("Successfully built clientset")
@@ -83,7 +83,7 @@ func Values(UserKubeconfig string) *kubernetes.Clientset {
 
 }
 
-func Pods(AgentNamespace string) string {
+func Pods(AgentNamespace string, ContainerDetails bool) string {
 	// for Pods
 	clientset := Values("")
 
@@ -105,18 +105,22 @@ func Pods(AgentNamespace string) string {
 					CreatedAt:       pods.Items[i].CreationTimestamp.String(),
 					UniqueID:        string(pods.Items[i].GetUID()),
 					NodeName:        string(pods.Items[i].Spec.NodeName),
+					IP:              string(pods.Items[i].Status.PodIP),
 					ContainersCount: len(pods.Items[i].Spec.Containers),
 					Labels:          pods.Items[i].Labels,
 				})
+			if ContainerDetails {
 
-			for j := 0; j < len(pods.Items[i].Spec.Containers); j++ {
-				containerInfo = append(containerInfo,
-					Container{Name: pods.Items[i].Spec.Containers[j].Name,
-						Container:       j,
-						Image:           pods.Items[i].Spec.Containers[j].Image,
-						ImagePullPolicy: string(pods.Items[i].Spec.Containers[j].ImagePullPolicy),
-						Port:            int(pods.Items[i].Spec.Containers[j].Ports[0].ContainerPort),
-					})
+				for j := 0; j < len(pods.Items[i].Spec.Containers); j++ {
+
+					containerInfo = append(containerInfo,
+						Container{Name: pods.Items[i].Spec.Containers[j].Name,
+							Container:       j,
+							Image:           pods.Items[i].Spec.Containers[j].Image,
+							ImagePullPolicy: string(pods.Items[i].Spec.Containers[j].ImagePullPolicy),
+							Port:            pods.Items[i].Spec.Containers[j].Ports,
+						})
+				}
 			}
 			podInfo[i].ContainersInfo = containerInfo
 		}

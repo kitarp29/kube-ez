@@ -35,8 +35,11 @@ type Container struct {
 }
 
 type Deployment struct {
-	Name   string
-	Status string
+	Name      string
+	Status    string
+	CreatedAt string
+	UniqueID  string
+	Labels    map[string]string
 }
 
 type Configmap struct {
@@ -100,7 +103,8 @@ func Pods(AgentNamespace string, ContainerDetails bool) string {
 		for i := 0; i < len(pods.Items); i++ {
 
 			podInfo = append(podInfo,
-				Pod{Name: pods.Items[i].Name,
+				Pod{
+					Name:            pods.Items[i].Name,
 					Status:          string(pods.Items[i].Status.Phase),
 					CreatedAt:       pods.Items[i].CreationTimestamp.String(),
 					UniqueID:        string(pods.Items[i].GetUID()),
@@ -114,7 +118,8 @@ func Pods(AgentNamespace string, ContainerDetails bool) string {
 				for j := 0; j < len(pods.Items[i].Spec.Containers); j++ {
 
 					containerInfo = append(containerInfo,
-						Container{Name: pods.Items[i].Spec.Containers[j].Name,
+						Container{
+							Name:            pods.Items[i].Spec.Containers[j].Name,
 							Container:       j,
 							Image:           pods.Items[i].Spec.Containers[j].Image,
 							ImagePullPolicy: string(pods.Items[i].Spec.Containers[j].ImagePullPolicy),
@@ -147,8 +152,18 @@ func Deployments(AgentNamespace string) string {
 	if err != nil {
 		log.Panic(err.Error())
 	} else {
+
 		for i := 0; i < len(deployments.Items); i++ {
-			deploymentInfo = append(deploymentInfo, Deployment{deployments.Items[i].Name, string(deployments.Items[i].Status.Conditions[0].Type)})
+			//fmt.Println((deployments.Items[i].Status.Conditions))
+
+			deploymentInfo = append(deploymentInfo,
+				Deployment{
+					Name:      deployments.Items[i].Name,
+					Status:    string(deployments.Items[i].Status.Conditions[0].Type),
+					CreatedAt: deployments.Items[i].CreationTimestamp.String(),
+					UniqueID:  string(deployments.Items[i].UID),
+					Labels:    deployments.Items[i].Labels,
+				})
 		}
 
 		deployment_json, err := json.Marshal(deploymentInfo)

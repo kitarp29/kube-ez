@@ -1,9 +1,11 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"os"
 
@@ -13,6 +15,9 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
+
+//var Kconfig chan *kubernetes.Clientset
+var Kconfig *kubernetes.Clientset
 
 type Pod struct {
 	Name            string
@@ -51,15 +56,18 @@ type Service struct {
 	Ports string
 }
 
-func Values(UserKubeconfig string) *kubernetes.Clientset {
+type Event struct {
+	Name       string
+	Type       string
+	ObjectName string
+	CreatedAt  string
+	UniqueID   string
+}
+
+func Main() {
 	log.Print("Shared Informer app started")
 
 	kubeconfig := os.Getenv("KUBECONFIG")
-	//AgentNamespace := "default"
-
-	if kubeconfig == "" {
-		kubeconfig = UserKubeconfig
-	}
 
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
@@ -81,14 +89,14 @@ func Values(UserKubeconfig string) *kubernetes.Clientset {
 	} else {
 		log.Print("Successfully built clientset")
 	}
+	//Kconfig <- clientset
 
-	return clientset
-
+	Kconfig = clientset
 }
 
 func Pods(AgentNamespace string, ContainerDetails bool) string {
 	// for Pods
-	clientset := Values("")
+	clientset := Kconfig
 
 	if AgentNamespace == "" {
 		AgentNamespace = "default"
@@ -140,8 +148,27 @@ func Pods(AgentNamespace string, ContainerDetails bool) string {
 	return "Error"
 }
 
+func PodLogs(AgentNamespace string, PodName string) string {
+	clientset := Kconfig
+	req := clientset.CoreV1().Pods(AgentNamespace).GetLogs(PodName, &(v1.PodLogOptions{}))
+	podLogs, err := req.Stream(context.Background())
+	if err != nil {
+		return "error in opening stream"
+	}
+	defer podLogs.Close()
+
+	buf := new(bytes.Buffer)
+	_, err = io.Copy(buf, podLogs)
+	if err != nil {
+		return "error in copy information from podLogs to buf"
+	}
+	str := buf.String()
+
+	return str
+}
+
 func Deployments(AgentNamespace string) string {
-	clientset := Values("")
+	clientset := Kconfig
 	if AgentNamespace == "" {
 		AgentNamespace = "default"
 	}
@@ -177,7 +204,7 @@ func Deployments(AgentNamespace string) string {
 }
 
 func Configmaps(AgentNamespace string) string {
-	clientset := Values("")
+	clientset := Kconfig
 
 	if AgentNamespace == "" {
 		AgentNamespace = "default"
@@ -203,7 +230,7 @@ func Configmaps(AgentNamespace string) string {
 }
 
 func Services(AgentNamespace string) string {
-	clientset := Values("")
+	clientset := Kconfig
 
 	if AgentNamespace == "" {
 		AgentNamespace = "default"
@@ -227,14 +254,31 @@ func Services(AgentNamespace string) string {
 	return "Error"
 }
 
-// onAdd is the function executed when the kubernetes informer notified the presence of a new kubernetes node in the cluster
-// func onAdd(obj interface{}) {
-// 	// Cast the obj as node
-// 	node := obj.(*corev1.Node)
-// 	_, ok := node.GetLabels()["litmus"]
-// 	if ok {
-// 		fmt.Printf("It has the label!\n ")
-// 	} else {
-// 		fmt.Printf("It does not have the label!\n")
-// 	}
-// }
+func Events() string {
+	clientset := Kconfig
+
+	var eventsInfo []Event
+	AgentNamespace := "default"
+	events, err := clientset.CoreV1().Events(AgentNamespace).List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		log.Panic(err.Error())
+	} else {
+		for i := 0; i < len(events.Items); i++ {
+			eventsInfo = append(eventsInfo,
+				Event{
+					Name:       events.Items[i].Name,
+					ObjectName: (events.Items[i].InvolvedObject.Name),
+					CreatedAt:  events.Items[i].LastTimestamp.String(),
+					UniqueID:   string(events.Items[i].UID),
+					Type:       events.Items[i].Type,
+				})
+		}
+		event_json, err := json.Marshal(eventsInfo)
+		if err != nil {
+			log.Fatal(err)
+		}
+		//fmt.Println(string(pods_json))
+		return string(event_json)
+	}
+	return "Error"
+}

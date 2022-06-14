@@ -1,27 +1,17 @@
 package cmd
 
 import (
-	"fmt"
 	"os/exec"
 )
 
-func CreateNamespace() {
-	app := "kubectl"
+func Event() string {
 
-	arg0 := "create"
-	arg1 := "namespace"
-	arg2 := "pk"
-	// arg2 := "\n\tfrom"
-	// arg3 := "golang"
-
-	cmd := exec.Command(app, arg0, arg1, arg2)
+	cmd := exec.Command("kubectl", "get", "events", "-o", "json")
 	stdout, err := cmd.Output()
-
+	// fmt.Println(reflect.TypeOf(stdout))
 	if err != nil {
-		fmt.Println(err.Error())
-		return
+		return (err.Error())
 	}
-
 	// Print the output
-	fmt.Println(string(stdout))
+	return (string(stdout))
 }

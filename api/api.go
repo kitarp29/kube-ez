@@ -56,6 +56,34 @@ type Service struct {
 	Ports string
 }
 
+type Secret struct {
+	Name      string
+	SecretMap map[string]string
+	Type      string
+	CreatedAt string
+	UniqueID  string
+}
+
+type Replicationcontroller struct {
+	Name      string
+	CreatedAt string
+	UniqueID  string
+	Labels    map[string]string
+}
+
+type Daemonset struct {
+	Name      string
+	CreatedAt string
+	UniqueID  string
+	Labels    map[string]string
+}
+
+type Namespace struct {
+	Name      string
+	CreatedAt string
+	UniqueID  string
+}
+
 type Event struct {
 	Name       string
 	Type       string
@@ -254,11 +282,13 @@ func Services(AgentNamespace string) string {
 	return "Error"
 }
 
-func Events() string {
+func Events(AgentNamespace string) string {
 	clientset := Kconfig
 
 	var eventsInfo []Event
-	AgentNamespace := "default"
+	if AgentNamespace == "" {
+		AgentNamespace = "default"
+	}
 	events, err := clientset.CoreV1().Events(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
 		log.Panic(err.Error())
@@ -281,4 +311,137 @@ func Events() string {
 		return string(event_json)
 	}
 	return "Error"
+}
+func Secrets(AgentNamespace string) string {
+	clientset := Kconfig
+	if AgentNamespace == "" {
+		AgentNamespace = "default"
+	}
+	secrets, err := clientset.CoreV1().Secrets(AgentNamespace).List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		log.Panic(err.Error())
+	} else {
+		var secretInfo []Secret
+		for i := 0; i < len(secrets.Items); i++ {
+			secretInfo = append(secretInfo,
+				Secret{
+					Name:      secrets.Items[i].Name,
+					Type:      string(secrets.Items[i].Type),
+					CreatedAt: secrets.Items[i].CreationTimestamp.String(),
+					UniqueID:  string(secrets.Items[i].UID),
+				})
+			tmp := make(map[string]string)
+			for key, value := range secrets.Items[i].Data {
+				tmp[key] = string(value)
+			}
+			secretInfo[i].SecretMap = tmp
+		}
+		secret_json, err := json.Marshal(secretInfo)
+		if err != nil {
+			log.Fatal(err)
+		}
+		//fmt.Println(string(secret_json))
+		return string(secret_json)
+	}
+	return "Error"
+}
+
+func ReplicationController(AgentNamespace string) string {
+	clientset := Kconfig
+	if AgentNamespace == "" {
+		AgentNamespace = "default"
+	}
+	replicationcontrollers, err := clientset.CoreV1().ReplicationControllers(AgentNamespace).List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		log.Panic(err.Error())
+	} else {
+		var replicationcontrollerInfo []Replicationcontroller
+		for i := 0; i < len(replicationcontrollers.Items); i++ {
+			replicationcontrollerInfo = append(replicationcontrollerInfo,
+				Replicationcontroller{
+					Name:      replicationcontrollers.Items[i].Name,
+					CreatedAt: replicationcontrollers.Items[i].CreationTimestamp.String(),
+					UniqueID:  string(replicationcontrollers.Items[i].UID),
+					Labels:    (replicationcontrollers.Items[i].Labels),
+				})
+		}
+		replicationcontroller_json, err := json.Marshal(replicationcontrollerInfo)
+		if err != nil {
+			log.Fatal(err)
+		}
+		//fmt.Println(string(replicationcontroller_json))
+		return string(replicationcontroller_json)
+	}
+	return "Error"
+}
+
+func DaemonSet(AgentNamespace string) string {
+	clientset := Kconfig
+	if AgentNamespace == "" {
+		AgentNamespace = "default"
+	}
+	daemonsets, err := clientset.ExtensionsV1beta1().DaemonSets(AgentNamespace).List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		log.Print(err.Error())
+	} else {
+		var daemonsetInfo []Daemonset
+		for i := 0; i < len(daemonsets.Items); i++ {
+			daemonsetInfo = append(daemonsetInfo,
+				Daemonset{
+					Name:      daemonsets.Items[i].Name,
+					CreatedAt: daemonsets.Items[i].CreationTimestamp.String(),
+					UniqueID:  string(daemonsets.Items[i].UID),
+					Labels:    (daemonsets.Items[i].Labels),
+				})
+		}
+		daemonset_json, err := json.Marshal(daemonsetInfo)
+		if err != nil {
+			log.Print(err.Error())
+		}
+		//fmt.Println(string(daemonset_json))
+		return string(daemonset_json)
+	}
+	return "Error"
+}
+
+func NameSpace() string {
+	clientset := Kconfig
+	namespaces, err := clientset.CoreV1().Namespaces().List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		log.Panic(err.Error())
+	} else {
+		var namespaceInfo []Namespace
+		for i := 0; i < len(namespaces.Items); i++ {
+			namespaceInfo = append(namespaceInfo,
+				Namespace{
+					Name:      namespaces.Items[i].Name,
+					CreatedAt: namespaces.Items[i].CreationTimestamp.String(),
+					UniqueID:  string(namespaces.Items[i].UID),
+				})
+		}
+		namespace_json, err := json.Marshal(namespaceInfo)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return string(namespace_json)
+	}
+	return "Error"
+}
+
+func CreateNamespace(namespace string) string {
+	fmt.Println(namespace)
+	clientset := Kconfig
+	ns := &v1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: namespace,
+			Labels: map[string]string{
+				"name": namespace,
+			},
+		},
+	}
+	_, err := clientset.CoreV1().Namespaces().Create(context.Background(), ns, metav1.CreateOptions{})
+	if err != nil {
+		return err.Error()
+	}
+	return "Namespace Created"
 }

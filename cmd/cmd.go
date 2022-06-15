@@ -1,14 +1,16 @@
 package cmd
 
 import (
+	"fmt"
 	"os/exec"
+	"strings"
 )
 
-func Event() string {
-
-	cmd := exec.Command("kubectl", "get", "events", "-o", "json")
+func Command(commands string) string {
+	command := strings.Fields(commands)
+	fmt.Println(command)
+	cmd := exec.Command(command[0], command[1:]...)
 	stdout, err := cmd.Output()
-	// fmt.Println(reflect.TypeOf(stdout))
 	if err != nil {
 		return (err.Error())
 	}

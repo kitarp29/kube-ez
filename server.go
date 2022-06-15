@@ -2,6 +2,7 @@ package main
 
 import (
 	api "k8-api/api"
+	"k8-api/cmd"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -39,6 +40,11 @@ func main() {
 		return c.String(http.StatusOK, api.Pods(namespace, containerDetails))
 	})
 
+	e.GET("/namespace", func(c echo.Context) error {
+
+		return c.String(http.StatusOK, api.NameSpace())
+	})
+
 	e.GET("/deployments", func(c echo.Context) error {
 		namespace := c.QueryParam("namespace")
 		return c.String(http.StatusOK, api.Deployments(namespace))
@@ -55,15 +61,40 @@ func main() {
 	})
 
 	e.GET("/events", func(c echo.Context) error {
-		return c.String(http.StatusOK, api.Events())
+		namespace := c.QueryParam("namespace")
+		return c.String(http.StatusOK, api.Events(namespace))
 	})
 
-	e.GET("/podlogs", func(c echo.Context) error {
+	e.GET("/secrets", func(c echo.Context) error {
+		namespace := c.QueryParam("namespace")
+		return c.String(http.StatusOK, api.Secrets(namespace))
+	})
+
+	e.GET("/replicationController", func(c echo.Context) error {
+		namespace := c.QueryParam("namespace")
+		return c.String(http.StatusOK, api.ReplicationController(namespace))
+	})
+
+	e.GET("/daemonset", func(c echo.Context) error {
+		namespace := c.QueryParam("namespace")
+		return c.String(http.StatusOK, api.DaemonSet(namespace))
+	})
+
+	e.GET("/podLogs", func(c echo.Context) error {
 		namespace := c.QueryParam("namespace")
 		pod := c.QueryParam("pod")
 		return c.String(http.StatusOK, api.PodLogs(namespace, pod))
 	})
 
+	e.GET("/command", func(c echo.Context) error {
+		commands := c.QueryParam("command")
+		return c.String(http.StatusOK, cmd.Command(commands))
+	})
+
+	e.POST("/createNamespace", func(c echo.Context) error {
+		namespace := c.FormValue("namespace")
+		return c.String(http.StatusOK, api.CreateNamespace(namespace))
+	})
 	// Run Server
 	e.Logger.Fatal(e.Start(":8000"))
 }

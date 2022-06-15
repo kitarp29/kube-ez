@@ -95,6 +95,11 @@ func main() {
 		namespace := c.FormValue("namespace")
 		return c.String(http.StatusOK, api.CreateNamespace(namespace))
 	})
+
+	e.POST("/applyfile", func(c echo.Context) error {
+		filepath := c.FormValue("filepath")
+		return c.String(http.StatusOK, api.DynamicClient(filepath))
+	})
 	// Run Server
 	e.Logger.Fatal(e.Start(":8000"))
 }

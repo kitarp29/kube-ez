@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 
@@ -14,6 +15,9 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 )
 
 //var Kconfig chan *kubernetes.Clientset
@@ -443,5 +447,30 @@ func CreateNamespace(namespace string) string {
 	if err != nil {
 		return err.Error()
 	}
-	return "Namespace Created"
+	return "Namespace: " + namespace + " Created!"
+}
+
+func DynamicClient(Filepath string) string {
+	obj := &unstructured.Unstructured{}
+
+	// decode YAML into unstructured.Unstructured
+	dec := yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
+	file, err := ioutil.ReadFile(Filepath)
+	if err != nil {
+		return err.Error()
+	}
+
+	_, gvk, err := dec.Decode([]byte(file), nil, obj)
+	if err != nil {
+		return (err.Error())
+	}
+	// Get the common metadata, and show GVK
+	fmt.Println(obj.GetName(), gvk.String())
+
+	// encode back to JSON
+	enc := json.NewEncoder(os.Stdout)
+	enc.SetIndent("", "    ")
+	enc.Encode(obj)
+
+	return Filepath + " Applied!"
 }

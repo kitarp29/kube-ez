@@ -106,7 +106,58 @@ func main() {
 	// 	filepath := c.FormValue("filepath")
 	// 	return c.String(http.StatusOK, api.OnlineDyanmicClient(filepath))
 	// })
+	e.DELETE("/deleteNamespace", func(c echo.Context) error {
+		namespace := c.FormValue("namespace")
+		return c.String(http.StatusOK, api.DeleteNamespace(namespace))
+	})
 
+	e.DELETE("/deleteDeployment", func(c echo.Context) error {
+		namespace := c.FormValue("namespace")
+		deployment := c.FormValue("deployment")
+		return c.String(http.StatusOK, api.DeleteDeployment(namespace, deployment))
+	})
+
+	e.DELETE("/deleteService", func(c echo.Context) error {
+		namespace := c.FormValue("namespace")
+		service := c.FormValue("service")
+		return c.String(http.StatusOK, api.DeleteService(namespace, service))
+	})
+
+	e.DELETE("/deleteConfigMap", func(c echo.Context) error {
+		namespace := c.FormValue("namespace")
+		configMap := c.FormValue("configMap")
+		return c.String(http.StatusOK, api.DeleteConfigMap(namespace, configMap))
+	})
+
+	e.DELETE("/deleteSecret", func(c echo.Context) error {
+		namespace := c.FormValue("namespace")
+		secret := c.FormValue("secret")
+		return c.String(http.StatusOK, api.DeleteSecret(namespace, secret))
+	})
+
+	e.DELETE("/deleteReplicationController", func(c echo.Context) error {
+		namespace := c.FormValue("namespace")
+		replicationController := c.FormValue("replicationController")
+		return c.String(http.StatusOK, api.DeleteReplicationController(namespace, replicationController))
+	})
+
+	e.DELETE("/deleteDaemonSet", func(c echo.Context) error {
+		namespace := c.FormValue("namespace")
+		daemonSet := c.FormValue("daemonSet")
+		return c.String(http.StatusOK, api.DeleteDaemonSet(namespace, daemonSet))
+	})
+
+	e.DELETE("/deletePod", func(c echo.Context) error {
+		namespace := c.FormValue("namespace")
+		pod := c.FormValue("pod")
+		return c.String(http.StatusOK, api.DeletePod(namespace, pod))
+	})
+
+	e.DELETE("/deleteEvent", func(c echo.Context) error {
+		namespace := c.FormValue("namespace")
+		event := c.FormValue("event")
+		return c.String(http.StatusOK, api.DeleteEvent(namespace, event))
+	})
 	// Run Server
 	e.Logger.Fatal(e.Start(":8000"))
 }

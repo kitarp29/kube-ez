@@ -2,6 +2,7 @@ package main
 
 import (
 	api "k8-api/api"
+	apply "k8-api/apply"
 	"k8-api/cmd"
 	"net/http"
 
@@ -86,7 +87,7 @@ func main() {
 		return c.String(http.StatusOK, api.PodLogs(namespace, pod))
 	})
 
-	e.GET("/command", func(c echo.Context) error {
+	e.POST("/command", func(c echo.Context) error {
 		commands := c.QueryParam("command")
 		return c.String(http.StatusOK, cmd.Command(commands))
 	})
@@ -96,10 +97,16 @@ func main() {
 		return c.String(http.StatusOK, api.CreateNamespace(namespace))
 	})
 
-	e.POST("/applyfile", func(c echo.Context) error {
+	e.POST("/applyFile", func(c echo.Context) error {
 		filepath := c.FormValue("filepath")
-		return c.String(http.StatusOK, api.DynamicClient(filepath))
+		return c.String(http.StatusOK, apply.Main(filepath))
 	})
+
+	// e.POST("/applyOnlineFile", func(c echo.Context) error {
+	// 	filepath := c.FormValue("filepath")
+	// 	return c.String(http.StatusOK, api.OnlineDyanmicClient(filepath))
+	// })
+
 	// Run Server
 	e.Logger.Fatal(e.Start(":8000"))
 }

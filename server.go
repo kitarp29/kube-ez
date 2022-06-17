@@ -4,6 +4,7 @@ import (
 	api "k8-api/api"
 	apply "k8-api/apply"
 	"k8-api/cmd"
+	"k8-api/install"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -87,6 +88,24 @@ func main() {
 		return c.String(http.StatusOK, api.PodLogs(namespace, pod))
 	})
 
+	e.GET("/helmRepoUpdate", func(c echo.Context) error {
+		return c.String(http.StatusOK, install.RepoUpdate())
+	})
+
+	e.POST("/helmRepoAdd", func(c echo.Context) error {
+		url := c.QueryParam("url")
+		repoName := c.QueryParam("repoName")
+		return c.String(http.StatusOK, install.RepoAdd(repoName, url))
+	})
+
+	e.POST("/helmInstall", func(c echo.Context) error {
+		namespace := c.QueryParam("namespace")
+		chartName := c.QueryParam("chartName")
+		name := c.QueryParam("name")
+		repo := c.QueryParam("repo")
+		return c.String(http.StatusOK, install.InstallChart(namespace, chartName, name, repo))
+	})
+
 	e.POST("/command", func(c echo.Context) error {
 		commands := c.QueryParam("command")
 		return c.String(http.StatusOK, cmd.Command(commands))
@@ -106,6 +125,13 @@ func main() {
 	// 	filepath := c.FormValue("filepath")
 	// 	return c.String(http.StatusOK, api.OnlineDyanmicClient(filepath))
 	// })
+
+	e.DELETE("/deleteHelm", func(c echo.Context) error {
+		namespace := c.FormValue("namespace")
+		name := c.FormValue("name")
+		return c.String(http.StatusOK, install.DeleteChart(name, namespace))
+	})
+
 	e.DELETE("/deleteNamespace", func(c echo.Context) error {
 		namespace := c.FormValue("namespace")
 		return c.String(http.StatusOK, api.DeleteNamespace(namespace))
@@ -158,6 +184,12 @@ func main() {
 		event := c.FormValue("event")
 		return c.String(http.StatusOK, api.DeleteEvent(namespace, event))
 	})
+
+	e.DELETE("/deleteAll", func(c echo.Context) error {
+		namespace := c.FormValue("namespace")
+		return c.String(http.StatusOK, api.DeleteAll(namespace))
+	})
+
 	// Run Server
 	e.Logger.Fatal(e.Start(":8000"))
 }

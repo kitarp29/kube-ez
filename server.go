@@ -43,7 +43,6 @@ func main() {
 	})
 
 	e.GET("/namespace", func(c echo.Context) error {
-
 		return c.String(http.StatusOK, api.NameSpace())
 	})
 

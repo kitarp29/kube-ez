@@ -24,6 +24,7 @@ func Main(filename string) string {
 
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
+		log.Print(err.Error())
 		return (err.Error())
 	}
 	log.Printf("%q \n", string(b))
@@ -34,11 +35,13 @@ func Main(filename string) string {
 
 	c, err := kubernetes.NewForConfig(config)
 	if err != nil {
+		log.Print(err.Error())
 		return (err.Error())
 	}
 
 	dd, err := dynamic.NewForConfig(config)
 	if err != nil {
+		log.Print(err.Error())
 		return (err.Error())
 	}
 
@@ -46,16 +49,19 @@ func Main(filename string) string {
 	for {
 		var rawObj runtime.RawExtension
 		if err = decoder.Decode(&rawObj); err != nil {
+			log.Print(err.Error())
 			break
 		}
 
 		obj, gvk, err := yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme).Decode(rawObj.Raw, nil, nil)
 		if err != nil {
+			log.Print(err.Error())
 			return (err.Error())
 		}
 
 		unstructuredMap, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
 		if err != nil {
+			log.Print(err.Error())
 			return (err.Error())
 		}
 
@@ -63,12 +69,14 @@ func Main(filename string) string {
 
 		gr, err := restmapper.GetAPIGroupResources(c.Discovery())
 		if err != nil {
+			log.Print(err.Error())
 			return (err.Error())
 		}
 
 		mapper := restmapper.NewDiscoveryRESTMapper(gr)
 		mapping, err := mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
 		if err != nil {
+			log.Print(err.Error())
 			return (err.Error())
 		}
 
@@ -83,10 +91,12 @@ func Main(filename string) string {
 		}
 
 		if _, err := dri.Create(context.Background(), unstructuredObj, metav1.CreateOptions{}); err != nil {
+			log.Print(err.Error())
 			return (err.Error())
 		}
 	}
 	if err != io.EOF {
+		log.Print(err.Error())
 		return (err.Error())
 	}
 	return filename + " Applied!"

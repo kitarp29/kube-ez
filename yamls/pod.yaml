@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: k8s-api
+spec:
+  serviceAccount: k8s-api
+  containers:
+  - name: k8s-api
+    image: kitarp29/k8s-api:2.0
+    ports:
+    - containerPort: 8000

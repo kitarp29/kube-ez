@@ -3,7 +3,6 @@ package main
 import (
 	api "k8-api/api"
 	apply "k8-api/apply"
-	"k8-api/cmd"
 	"k8-api/install"
 	"net/http"
 
@@ -27,13 +26,6 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Yes! I am alive!\n")
 	})
-
-	//route to get the k8s cluster info
-	// e.POST("/kubeconfig", func(c echo.Context) error {
-	// 	//kubeconfig := c.FormValue("kubeconfig")
-	// 	//fmt.Println(api.Values())
-	// 	return c.String(http.StatusOK, "Kubeconfig is paased\n")
-	// })
 
 	//route to get the Pods info in a namespace
 	e.GET("/pods", func(c echo.Context) error {
@@ -105,11 +97,6 @@ func main() {
 		return c.String(http.StatusOK, install.InstallChart(namespace, chartName, name, repo))
 	})
 
-	e.POST("/command", func(c echo.Context) error {
-		commands := c.QueryParam("command")
-		return c.String(http.StatusOK, cmd.Command(commands))
-	})
-
 	e.POST("/createNamespace", func(c echo.Context) error {
 		namespace := c.FormValue("namespace")
 		return c.String(http.StatusOK, api.CreateNamespace(namespace))
@@ -119,11 +106,6 @@ func main() {
 		filepath := c.FormValue("filepath")
 		return c.String(http.StatusOK, apply.Main(filepath))
 	})
-
-	// e.POST("/applyOnlineFile", func(c echo.Context) error {
-	// 	filepath := c.FormValue("filepath")
-	// 	return c.String(http.StatusOK, api.OnlineDyanmicClient(filepath))
-	// })
 
 	e.DELETE("/deleteHelm", func(c echo.Context) error {
 		namespace := c.FormValue("namespace")

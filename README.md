@@ -44,8 +44,6 @@ The project can be run *inside* the cluster as well as from *outside* the cluste
    > We can also use the *default* service account. But it is not recommended.
   
   > Verify the service account by running the following command: kubectl get serviceaccounts/Your-Custom-Name -o yaml
-
-  <br>
 - ## **Cluster Role**:
   
   We need to make a custom cluster role to be able to interact with the cluster. We will use this cluster role to bind to our **Service Account**. The role should have permission to all the resources in order for the project to run smoothly.
@@ -58,7 +56,6 @@ The project can be run *inside* the cluster as well as from *outside* the cluste
   We will bind the **Service Account** to the **Cluster Role** we just created. To do so the commands needed are:
 
   ```
-
   kubectl apply -f - <<EOF
   apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRoleBinding
@@ -72,7 +69,7 @@ The project can be run *inside* the cluster as well as from *outside* the cluste
     kind: ClusterRole
     name: cluster-admin # or the custom role you created in the last step
     apiGroup: rbac.authorization.k8s.io
-    EOF
+  EOF
   ```
 
   Or you can apply the YAML file using:
@@ -111,7 +108,7 @@ The project can be run *inside* the cluster as well as from *outside* the cluste
   To do so, we can use the following command:
 
   ```
-  kubectl port-forward <your-pod-name> 8000:8080
+  kubectl port-forward <your-pod-name> 8000:8000
   ```
 > API will be running at <a href="localhost:8000/"> localohost:8000/ </a> now.
   ## **The project is up and running🔥!**

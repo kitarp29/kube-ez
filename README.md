@@ -132,7 +132,7 @@ The project can be run *inside* the cluster as well as from *outside* the cluste
 
   There are multiple endpoints in the API. You can find all the endpoints in the [API Docs](https://github.com/kitarp29/k8s-api/master/API_DOCS.md)
 
-  Moreover you can find the **Postman Collections** [Here]() 📮
+  Moreover you can find the **Postman Collections** [Here](https://www.getpostman.com/collections/b14cdaad336ab81340b5) 📮
 
   <hr>
 

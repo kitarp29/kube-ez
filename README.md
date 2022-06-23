@@ -39,7 +39,7 @@ The project can be run *inside* the cluster as well as from *outside* the cluste
     ```
   Or you can apply the YAML file using:
   ```
-  kubectl apply -f https://raw.githubusercontent.com/kitarp29/k8s-api/master/yamls/sa.yaml
+  kubectl apply -f https://raw.githubusercontent.com/kitarp29/k8s-api/main/yamls/sa.yaml
   ```
    > We can also use the *default* service account. But it is not recommended.
   
@@ -75,7 +75,7 @@ The project can be run *inside* the cluster as well as from *outside* the cluste
   Or you can apply the YAML file using:
 
   ```
-  kubectl apply -f https://raw.githubusercontent.com/kitarp29/k8s-api/master/yamls/crb.yaml
+  kubectl apply -f https://raw.githubusercontent.com/kitarp29/k8s-api/main/yamls/crb.yaml
   ```
 
 - ## **Deploying the Pod**
@@ -100,7 +100,7 @@ The project can be run *inside* the cluster as well as from *outside* the cluste
   or you can apply the YAML file using:
 
   ```
-  kubectl apply -f https://raw.githubusercontent.com/kitarp29/k8s-api/master/yamls/pod.yaml
+  kubectl apply -f https://raw.githubusercontent.com/kitarp29/k8s-api/main/yamls/pod.yaml
   ```
 - ## **Port-forward**:
   
@@ -130,7 +130,7 @@ The project can be run *inside* the cluster as well as from *outside* the cluste
 
 ##  <u>**API Docs**</u> 📖
 
-  There are multiple endpoints in the API. You can find all the endpoints in the [API Docs](https://github.com/kitarp29/k8s-api/master/API_DOCS.md)
+  There are multiple endpoints in the API. You can find all the endpoints in the [API Docs](https://github.com/kitarp29/k8s-api/main/API_DOCS.md)
 
   Moreover you can find the **Postman Collections** [Here](https://www.getpostman.com/collections/b14cdaad336ab81340b5) 📮
 
@@ -139,7 +139,7 @@ The project can be run *inside* the cluster as well as from *outside* the cluste
   ## <u>**Contributors Guide**</u> 🥰
   
   Thanks for considering to contribute to the project. If you have any questions, please feel free to contact me at [Twiiter](https://twitter.com/kitarp29).
-  The Contributors Guide is available [Here](https://github.com/kitarp29/k8s-api/master/CONTRIBUTING.md) 📖
+  The Contributors Guide is available [Here](https://github.com/kitarp29/k8s-api/main/CONTRIBUTING.md) 📖
 
   <hr>
 

@@ -2,7 +2,7 @@
 
 This document is a collection of API endpoints for this repository. It will explain the endpoints and how to use them. The endpoints are grouped into sections based on the path. The method, parmaters and response are described in below.
 
-### **Postman collection** : [Here]()
+### **Postman collection** : [Here](https://www.getpostman.com/collections/b14cdaad336ab81340b5)
 
 <hr>
 

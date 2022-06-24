@@ -43,14 +43,14 @@ func RepoAdd(name, url string) string {
 	fileLock := flock.New(strings.Replace(repoFile, filepath.Ext(repoFile), ".lock", 1))
 	lockCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	defer func() {
-		if err := fileLock.Unlock(); err != nil {
-			log.Println(err)
-		}
-	}()
+
 	locked, err := fileLock.TryLockContext(lockCtx, time.Second)
 	if err == nil && locked {
-		defer fileLock.Unlock()
+		defer func() {
+			if err := fileLock.Unlock(); err != nil {
+				log.Println(err)
+			}
+		}()
 	}
 	if err != nil {
 		log.Print(err.Error())

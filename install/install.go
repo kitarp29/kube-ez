@@ -236,7 +236,10 @@ func isChartInstallable(ch *chart.Chart) (bool, error) {
 
 func debug(format string, v ...interface{}) {
 	format = fmt.Sprintf("[debug] %s\n", format)
-	log.Output(2, fmt.Sprintf(format, v...))
+	err := log.Output(2, fmt.Sprintf(format, v...))
+	if err != nil {
+		log.Print(err.Error())
+	}
 }
 
 func DeleteChart(name, namespace string) string {

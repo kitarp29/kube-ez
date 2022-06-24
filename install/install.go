@@ -42,6 +42,7 @@ func RepoAdd(name, url string) string {
 	// Acquire a file lock for process synchronization
 	fileLock := flock.New(strings.Replace(repoFile, filepath.Ext(repoFile), ".lock", 1))
 	lockCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	defer func() {
 		if err := fileLock.Unlock(); err != nil {
 			log.Println(err)

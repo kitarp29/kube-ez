@@ -14,9 +14,10 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-//var Kconfig chan *kubernetes.Clientset
+//setting a Global variable for the clientset so that I can resuse throughout the code
 var Kconfig *kubernetes.Clientset
 
+// These are all the Structs that are used in the API later in this code
 type Pod struct {
 	Name            string
 	Status          string
@@ -90,8 +91,14 @@ type Event struct {
 	UniqueID   string
 }
 
+//This function is used to interact with the Kubernetes Cluster to get the clienset
+// It has two options:
+// 1. Current it's setup to be used inside a cluster
+// 2. We can configure it to be used outside the cluster
+
 func Main() {
 	log.Print("Shared Informer app started")
+
 	// This will be used in case you have to run the code outside the cluster
 	// You will have to export the KUBECONFIG variable to point to the config file in the terminal
 	// kubeconfig := os.Getenv("KUBECONFIG")
@@ -133,6 +140,7 @@ func Main() {
 	Kconfig = clientset
 }
 
+// This function is used to get the list of all the pods in the cluster with container details
 func Pods(AgentNamespace string, ContainerDetails bool) string {
 	// for Pods
 	clientset := Kconfig
@@ -189,6 +197,7 @@ func Pods(AgentNamespace string, ContainerDetails bool) string {
 	return "Error"
 }
 
+// This function is used to get the list of all the logs in a pod.
 func PodLogs(AgentNamespace string, PodName string) string {
 	clientset := Kconfig
 	req := clientset.CoreV1().Pods(AgentNamespace).GetLogs(PodName, &(v1.PodLogOptions{}))
@@ -209,6 +218,7 @@ func PodLogs(AgentNamespace string, PodName string) string {
 	return str
 }
 
+// This function is used to get the list of all the deployments in the cluster
 func Deployments(AgentNamespace string) string {
 	clientset := Kconfig
 	if AgentNamespace == "" {
@@ -247,6 +257,7 @@ func Deployments(AgentNamespace string) string {
 	return "Error"
 }
 
+// This function is used to get the list of all the Configmaps in the cluster
 func Configmaps(AgentNamespace string) string {
 	clientset := Kconfig
 
@@ -275,6 +286,7 @@ func Configmaps(AgentNamespace string) string {
 	return "Error"
 }
 
+// This function is used to get the list of all the Services in the cluster
 func Services(AgentNamespace string) string {
 	clientset := Kconfig
 
@@ -302,6 +314,7 @@ func Services(AgentNamespace string) string {
 	return "Error"
 }
 
+// This function is used to get the list of all the events in the cluster
 func Events(AgentNamespace string) string {
 	clientset := Kconfig
 
@@ -334,6 +347,8 @@ func Events(AgentNamespace string) string {
 	}
 	return "Error"
 }
+
+// This function is used to get the list of all the secrets in the cluster
 func Secrets(AgentNamespace string) string {
 	clientset := Kconfig
 	if AgentNamespace == "" {
@@ -370,6 +385,7 @@ func Secrets(AgentNamespace string) string {
 	return "Error"
 }
 
+// This function is used to get the list of all the ReplicaController in the cluster
 func ReplicationController(AgentNamespace string) string {
 	clientset := Kconfig
 	if AgentNamespace == "" {
@@ -401,6 +417,7 @@ func ReplicationController(AgentNamespace string) string {
 	return "Error"
 }
 
+// This function is used to get the list of all the Daemonsets in the cluster
 func DaemonSet(AgentNamespace string) string {
 	clientset := Kconfig
 	if AgentNamespace == "" {
@@ -432,6 +449,7 @@ func DaemonSet(AgentNamespace string) string {
 	return "Error"
 }
 
+// This function is used to get the list of all the Namespaces in the cluster
 func NameSpace() string {
 	clientset := Kconfig
 	namespaces, err := clientset.CoreV1().Namespaces().List(context.Background(), metav1.ListOptions{})
@@ -458,6 +476,7 @@ func NameSpace() string {
 	return "Error"
 }
 
+// This function creates Namespace in the cluster
 func CreateNamespace(namespace string) string {
 	fmt.Println(namespace)
 	clientset := Kconfig
@@ -477,6 +496,7 @@ func CreateNamespace(namespace string) string {
 	return "Namespace: " + namespace + " Created!"
 }
 
+// This function deletes Namespace in the cluster
 func DeleteNamespace(namespace string) string {
 	clientset := Kconfig
 	err := clientset.CoreV1().Namespaces().Delete(context.Background(), namespace, metav1.DeleteOptions{})
@@ -487,6 +507,7 @@ func DeleteNamespace(namespace string) string {
 	return "Namespace: " + namespace + " Deleted!"
 }
 
+// This function Deletes the Deployments
 func DeleteDeployment(namespace string, deployment string) string {
 	clientset := Kconfig
 	err := clientset.AppsV1().Deployments(namespace).Delete(context.Background(), deployment, metav1.DeleteOptions{})
@@ -497,6 +518,7 @@ func DeleteDeployment(namespace string, deployment string) string {
 	return "Deployment: " + deployment + " Deleted!"
 }
 
+// This function Deletes the services
 func DeleteService(namespace string, service string) string {
 	clientset := Kconfig
 	err := clientset.CoreV1().Services(namespace).Delete(context.Background(), service, metav1.DeleteOptions{})
@@ -507,6 +529,7 @@ func DeleteService(namespace string, service string) string {
 	return "Service: " + service + " Deleted!"
 }
 
+// This function Deletes the ConfigMap
 func DeleteConfigMap(namespace string, configmap string) string {
 	clientset := Kconfig
 	err := clientset.CoreV1().ConfigMaps(namespace).Delete(context.Background(), configmap, metav1.DeleteOptions{})
@@ -517,6 +540,7 @@ func DeleteConfigMap(namespace string, configmap string) string {
 	return "ConfigMap: " + configmap + " Deleted!"
 }
 
+// This function Deletes the Secrets
 func DeleteSecret(namespace string, secret string) string {
 	clientset := Kconfig
 	err := clientset.CoreV1().Secrets(namespace).Delete(context.Background(), secret, metav1.DeleteOptions{})
@@ -527,6 +551,7 @@ func DeleteSecret(namespace string, secret string) string {
 	return "Secret: " + secret + " Deleted!"
 }
 
+// This function Deletes the ReplicationController
 func DeleteReplicationController(namespace string, replicationcontroller string) string {
 	clientset := Kconfig
 	err := clientset.CoreV1().ReplicationControllers(namespace).Delete(context.Background(), replicationcontroller, metav1.DeleteOptions{})
@@ -537,6 +562,7 @@ func DeleteReplicationController(namespace string, replicationcontroller string)
 	return "ReplicationController: " + replicationcontroller + " Deleted!"
 }
 
+// This function Deletes the DaemonSet
 func DeleteDaemonSet(namespace string, daemonset string) string {
 	clientset := Kconfig
 	err := clientset.ExtensionsV1beta1().DaemonSets(namespace).Delete(context.Background(), daemonset, metav1.DeleteOptions{})
@@ -547,6 +573,7 @@ func DeleteDaemonSet(namespace string, daemonset string) string {
 	return "DaemonSet: " + daemonset + " Deleted!"
 }
 
+// This function Deletes the Pod
 func DeletePod(namespace string, pod string) string {
 	clientset := Kconfig
 	err := clientset.CoreV1().Pods(namespace).Delete(context.Background(), pod, metav1.DeleteOptions{})
@@ -557,6 +584,7 @@ func DeletePod(namespace string, pod string) string {
 	return "Pod: " + pod + " Deleted!"
 }
 
+// This function Deletes the Event
 func DeleteEvent(namespace string, event string) string {
 	clientset := Kconfig
 	err := clientset.CoreV1().Events(namespace).Delete(context.Background(), event, metav1.DeleteOptions{})
@@ -567,6 +595,7 @@ func DeleteEvent(namespace string, event string) string {
 	return "Event: " + event + " Deleted!"
 }
 
+// This function Deletes EVERYTHING in the namespace. My lil nuke!! MUWAHAHAHA
 func DeleteAll(namespace string) string {
 	clientset := Kconfig
 	deployments, err := clientset.AppsV1().Deployments(namespace).List(context.Background(), metav1.ListOptions{})

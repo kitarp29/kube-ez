@@ -254,9 +254,8 @@ This document is a collection of API endpoints for this repository. It will expl
 
 - **Apply**
 
-    > The Container will not have the YAML file preloaded on the container. You can download them using ```wget``` or ```curl```.
+    > The Container will not have the YAML file preloaded on the container. You can download them using ```wget``` 
 
-        ```
         Method: POST
         Endpoint: /apply
         Parametes:
@@ -265,7 +264,6 @@ This document is a collection of API endpoints for this repository. It will expl
             - httpStatusOk: 200
             - message: YAML/JSON file applied
             - type: string
-        ```
 <hr>
 
 ## Help Routes

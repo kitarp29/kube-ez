@@ -9,12 +9,13 @@
 
 ##  <u>**Introduction**</u> 👋🏻
 
-This is a simple k8s-api project. It is built on **Golang** and utilises the **client-go** library to interact with Kubernetes Cluster.
-It is a plug and play solution and can be used to create a k8s-api server. Aim is to build a simple k8s-api server that can be used to interact with any Kubernetes cluster.
+This is a simple k8s-api project. It is built on **Golang** and utilizes the **client-go** library to interact with Kubernetes Cluster.
+It is a plug-and-play solution and can be used to create a k8s-api server. In three easy steps, you will have a simple API to interact with your cluster.
+The aim is to build a simple k8s-api server that can be used to interact with any Kubernetes cluster.
 
- In my industrial experience I have realised that Kuberenetes is a very powerful tool but, only used by a handful of people. Problem is not grasping the concept of the cluster. My last Product Manager was much versed in AWS than I am. 
-The reason I feel that Kuberenetes is still only used by a couple of Developers in every firm because there is no easier way to interact with it.
-This project will provide a bunch of API endpoints to perform various funstions on the cluster. For now, I will have the Postman collections and API docs to achieve it, plan is build a Dashboard on the API later.
+ In my industrial experience, I have realized that **Kubernetes** is a very powerful tool but, only used by a handful of developers in the organization. The problem is not grasping the concept of the cluster. My last Product Manager was much more versed in AWS than I am. 
+I feel the reason is that there is no easier way to interact with it.
+This project will provide a bunch of API endpoints to perform various functions on the cluster. For now, I will have the Postman collections and API docs to achieve it, plan is to build a Dashboard on the API later.
 
 **Docker Image: [kitarp29/k8s-api](https://hub.docker.com/repository/docker/kitarp29/k8s-api)**
 > Use the Docker image with tag 2.0 or above to run the k8s-api server.
@@ -22,12 +23,12 @@ This project will provide a bunch of API endpoints to perform various funstions 
 
 ## <u>**Getting started**</u> ▶️
 
-To start using the project you need a Kubernetes Cluster and should have access to apply changes to the cluster.
-The project can be run *inside* the cluster as well as from *outside* the cluster. We will first discuss how to run the project from *inside* the cluster.
-### **Steps to follow** 🪜
+To start using the project you need a Kubernetes Cluster and should have the right access to apply changes to the cluster.
+The project can be run *inside* the cluster and from *outside* the cluster. We will first discuss how to run the project from *inside* the cluster.
+## **Steps to follow** 🪜
 - ## **Service Account**:
 
-  We need to make a custom service account to be able to interact with the cluster. We will use this service account in our Pod on which we will run the API.</br>
+  We need to make a custom service account to be able to interact with the cluster. We will use this service account in our pod on which we will run the API.</br>
  Command to make a service account: </br>
     ```
     kubectl apply -f - <<EOF
@@ -37,7 +38,7 @@ The project can be run *inside* the cluster as well as from *outside* the cluste
       name: <Your-Custom-Name>
     EOF
     ```
-  Or you can apply the YAML file using:
+  Or you can apply the [YAML file](https://raw.githubusercontent.com/kitarp29/k8s-api/main/yamls/sa.yaml) using:
   ```
   kubectl apply -f https://raw.githubusercontent.com/kitarp29/k8s-api/main/yamls/sa.yaml
   ```
@@ -47,8 +48,7 @@ The project can be run *inside* the cluster as well as from *outside* the cluste
 - ## **Cluster Role**:
   
   We need to make a custom cluster role to be able to interact with the cluster. We will use this cluster role to bind to our **Service Account**. The role should have permission to all the resources in order for the project to run smoothly.
-  
-  I would advice not to make any Role and use the *cluster-admin* role directly. Still if you want to create a custom role, you can do so. [Here](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
+  I would advise you not to make any role and use the *cluster-admin* role directly. Still, if you want to create a custom role, you can do so. [Here](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
   </br>
 
 - ## **Cluster Role Binding**:
@@ -63,16 +63,16 @@ The project can be run *inside* the cluster as well as from *outside* the cluste
     name: <your-custom-name>
   subjects:
   - kind: ServiceAccount
-    name: <Name-of-your-serviceaccount> # name of your service account
-    namespace: dev # this is the namespace your service account is in
-  roleRef: # referring to your ClusterRole
+    name: <Name-of-your-serviceaccount> 
+    namespace: default
+  roleRef:
     kind: ClusterRole
-    name: cluster-admin # or the custom role you created in the last step
+    name: cluster-admin
     apiGroup: rbac.authorization.k8s.io
   EOF
   ```
 
-  Or you can apply the YAML file using:
+  Or you can apply the [YAML](https://raw.githubusercontent.com/kitarp29/k8s-api/main/yamls/crb.yaml) file using:
 
   ```
   kubectl apply -f https://raw.githubusercontent.com/kitarp29/k8s-api/main/yamls/crb.yaml
@@ -80,7 +80,7 @@ The project can be run *inside* the cluster as well as from *outside* the cluste
 
 - ## **Deploying the Pod**
 
-  This is it! Now that we have the service account and the cluster role binding, we can deploy the pod. We can use this commad to deploy the pod:
+  This is it! Now that we have the service account and the cluster role binding, we can deploy the pod. We can use this command to deploy the pod:
 
   ```
   kubectl apply -f - <<EOF 
@@ -89,7 +89,7 @@ The project can be run *inside* the cluster as well as from *outside* the cluste
   metadata:
     name: <your-custom-name>
   spec:
-    serviceAccount: <Name-of-your-serviceaccount> # name of your service account
+    serviceAccount: <Name-of-your-serviceaccount> 
     containers:
     - name: <your-custom-name>
       image: kitarp29/k8s-api:2.0
@@ -97,7 +97,7 @@ The project can be run *inside* the cluster as well as from *outside* the cluste
       - containerPort: 8000
   EOF
   ```
-  or you can apply the YAML file using:
+  or you can apply the [YAML](https://raw.githubusercontent.com/kitarp29/k8s-api/main/yamls/pod.yaml) file using:
 
   ```
   kubectl apply -f https://raw.githubusercontent.com/kitarp29/k8s-api/main/yamls/pod.yaml
@@ -110,20 +110,20 @@ The project can be run *inside* the cluster as well as from *outside* the cluste
   ```
   kubectl port-forward <your-pod-name> 8000:8000
   ```
-> API will be running at <a href="localhost:8000/"> localohost:8000/ </a> now.
+> API will be running at <a href="localhost:8000/"> localohost:8000 </a> now.
   ## **The project is up and running🔥!**
   <hr>
 
 ##  <u>**Project Features**</u> 🤯
-  -  Get Details about any resource in the cluster.
+  -  Get details about any resource in the cluster.
   -  Create new resources in the cluster.
   -  Delete resources in the cluster.
-  -  Run CLI Commands using the API.
-  -  Manage HELM Charts.
+  -  Run CLI commands using the API.
+  -  Manage Helm Charts.
   -  You can add, install, delete and update HELM charts.
   -  Get live events from the cluster.
   -  It is a REST API to interact with the cluster.
-  -  It has health check endpoint as well.
+  -  It has a health check endpoint as well.
   -  More coming soon... 🚧
 
 <hr>
@@ -138,7 +138,7 @@ The project can be run *inside* the cluster as well as from *outside* the cluste
 
   ## <u>**Contributors Guide**</u> 🥰
   
-  Thanks for considering to contribute to the project. If you have any questions, please feel free to contact me at [Twiiter](https://twitter.com/kitarp29).
+  Thanks for considering contributing to the project. If you have any questions, please feel free to contact me at [Twiiter](https://twitter.com/kitarp29).
   The Contributors Guide is available [Here](https://github.com/kitarp29/k8s-api/main/CONTRIBUTING.md) 📖
 
   <hr>
@@ -153,11 +153,11 @@ The project can be run *inside* the cluster as well as from *outside* the cluste
 
   - **Is this a Unique Product?**
   
-      No, this is not a unique product. There are similar impelementaion made by other people.
+      No, this is not a unique product. There are similar implementations made by other developers.
   
   - **Purpose of this project?**
 
-     It's a pet project to learn *Kubernetes* and *Golang*. I wanted to build this to get a better understanding of these two technologies. I also explored *Docker*.
+     It's a pet project to learn *Kubernetes* and *Golang*. I wanted to build this to better understand these two technologies. I also explored *Docker*.
 
 
 

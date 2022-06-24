@@ -1,6 +1,5 @@
 # **K8s-API**
 [![GitHub contributors](https://img.shields.io/github/contributors/kitarp29/k8s-api)](https://github.com/GDSC-DSI/Schedura/graphs/contributors) [![GitHub issues](https://img.shields.io/github/issues/HAC-2020/Aimers)](https://github.com/kitarp29/k8s-api/issues/) 
-![GitHub stars](https://img.shields.io/github/stars/kitarp29/k8s-api) ![GitHub releases](https://img.shields.io/github/release/kitarp29/k8s-api)![GitHub license](https://img.shields.io/github/license/kitarp29/k8s-api)
 [![Docker](https://img.shields.io/docker/pulls/kitarp29/k8s-api)](https://hub.docker.com/repository/docker/kitarp29/k8s-api)
 [![Docker](https://img.shields.io/docker/stars/kitarp29/k8s-api)](https://hub.docker.com/repository/docker/kitarp29/k8s-api)
 ![Follow](https://img.shields.io/twitter/follow/kitarp29?label=Follow+Kitarp29&style=social)
@@ -130,7 +129,7 @@ The project can be run *inside* the cluster and from *outside* the cluster. We w
 
 ##  <u>**API Docs**</u> 📖
 
-  There are multiple endpoints in the API. You can find all the endpoints in the [API Docs](https://github.com/kitarp29/k8s-api/main/API_DOCS.md)
+  There are multiple endpoints in the API. You can find all the endpoints in the [API Docs](https://github.com/kitarp29/k8s-api/blob/main/API_DOCS.md)
 
   Moreover you can find the **Postman Collections** [Here](https://www.getpostman.com/collections/b14cdaad336ab81340b5) 📮
 
@@ -138,7 +137,7 @@ The project can be run *inside* the cluster and from *outside* the cluster. We w
 
   ## <u>**Contributors Guide**</u> 🥰
   
- Thanks for considering to contribute to the project. If you have any questions, please feel free to contact me at [Twiiter](https://twitter.com/kitarp29).
+ Thanks for considering to contribute to the project. If you have any questions, please feel free to contact me at [Twitter](https://twitter.com/kitarp29).
   The Contributors Guide is available [Here](https://github.com/kitarp29/k8s-api/blob/main/CONTRIBUTING.md) 📖
 
   <hr>

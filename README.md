@@ -138,8 +138,8 @@ The project can be run *inside* the cluster and from *outside* the cluster. We w
 
   ## <u>**Contributors Guide**</u> 🥰
   
-  Thanks for considering contributing to the project. If you have any questions, please feel free to contact me at [Twiiter](https://twitter.com/kitarp29).
-  The Contributors Guide is available [Here](https://github.com/kitarp29/k8s-api/main/CONTRIBUTING.md) 📖
+ Thanks for considering to contribute to the project. If you have any questions, please feel free to contact me at [Twiiter](https://twitter.com/kitarp29).
+  The Contributors Guide is available [Here](https://github.com/kitarp29/k8s-api/blob/main/CONTRIBUTING.md) 📖
 
   <hr>
 

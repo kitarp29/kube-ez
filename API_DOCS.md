@@ -1,12 +1,12 @@
 # **API Documentation**
 
-This document is a collection of API endpoints for this repository. It will explain the endpoints and how to use them. The endpoints are grouped into sections based on the path. The method, parmaters and response are described in below.
+This document is a collection of API endpoints for this repository. It will explain the endpoints and how to use them. The endpoints are grouped into sections based on the path. The method, parameters, and response are described below.
 
 ### **Postman collection** : [Here](https://www.getpostman.com/collections/b14cdaad336ab81340b5)
 
 <hr>
 
-## Kuberenetes Management Routes:
+## Kubernetes Management Routes:
 
 - **Home**
     ```
@@ -254,7 +254,7 @@ This document is a collection of API endpoints for this repository. It will expl
 
 - **Apply**
 
-    > The Container will no the YAML file preloaded in the container. You can download them using wget or curl.
+    > The Container will not have the YAML file preloaded on the container. You can download them using ```wget``` or ```curl```.
 
         ```
         Method: POST
@@ -282,7 +282,7 @@ This document is a collection of API endpoints for this repository. It will expl
         - message: Repo added
         - type: string
     ```
-- **Helm Repo Udpate**
+- **Helm Repo Update**
     ```
     Method: GET
     Endpoint: /helmRepoUpdate
@@ -322,4 +322,4 @@ This document is a collection of API endpoints for this repository. It will expl
 
 🚧 **More Routes under Construction**👷
 
-Thanks for your pateince! 🥰
+Thanks for your patience! 🥰

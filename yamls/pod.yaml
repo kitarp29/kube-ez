@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: k8s-api
+  name: kube-ez
 spec:
-  serviceAccount: k8s-api
+  serviceAccount: kube-ez
   containers:
-  - name: k8s-api
+  - name: kube-ez
     image: kitarp29/k8s-api:2.0
     ports:
     - containerPort: 8000

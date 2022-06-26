@@ -27,7 +27,7 @@ I am glad you are here. Hoping that you liked the project.
 1. Run the following command:
     ```
     $ git clone
-    $ cd k8s-api
+    $ cd kube-ez
     ```
 2. Make sure you have **Golang** installed on your system.
    
@@ -37,7 +37,7 @@ I am glad you are here. Hoping that you liked the project.
     > This project when built used ```go version go1.18.3 linux/amd64```
 3. If ```go.mod``` file is not present, then run the following command:
    ```
-   go mod init k8s-api
+   go mod init kube-ez
    ```
 4. Now, run the following command:
    ```
@@ -45,12 +45,12 @@ I am glad you are here. Hoping that you liked the project.
    ```
    > This command will pull all the latest packages from the internet.
 
-5. Now, if you have run it **inside the container**, then follow the steps given in [README.md](https://github.com/kitarp29/k8s-api/blob/main/README.md)
+5. Now, if you have run it **inside the container**, then follow the steps given in [README.md](https://github.com/kitarp29/kube-ez/blob/main/README.md)
 6. If you have to run it **outside the container**:
     - Uncomment the code in api/api.go file from line 97 to 119
     - Comment out the code in api/api..go from 123 to 131
     - The comments are self-explaining.
-    - Export a variable called ```KUBECONFIG``` and set it to the path of the kubeconfig file. (Usually ~/.kube/config)
+    - Export a variable called ```KUBECONFIG``` and set it to the path of the kube-ez kubeconfig file. (Usually ~/.kube/config)
     - Run the following command:
         ```
         export KUBECONFIG=~/.kube/config

@@ -8,7 +8,7 @@
 
 ##  <u>**Introduction**</u> 👋🏻
 
-.It is built on **Golang** and utilizes the **client-go** library to interact with Kubernetes Cluster.
+It is built on **Golang** and utilizes the **client-go** library to interact with Kubernetes Cluster.
 It is a plug-and-play solution and can be used to create a kube-ez server. In three easy steps, you will have a simple API to interact with your cluster.
 The aim is to build a simple API server that can be used to interact with any Kubernetes cluster.
 

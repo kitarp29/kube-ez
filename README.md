@@ -1,23 +1,23 @@
-# **K8s-API**
-[![GitHub contributors](https://img.shields.io/github/contributors/kitarp29/k8s-api)](https://github.com/GDSC-DSI/Schedura/graphs/contributors) [![GitHub issues](https://img.shields.io/github/issues/HAC-2020/Aimers)](https://github.com/kitarp29/k8s-api/issues/) 
-[![Docker](https://img.shields.io/docker/pulls/kitarp29/k8s-api)](https://hub.docker.com/repository/docker/kitarp29/k8s-api)
-[![Docker](https://img.shields.io/docker/stars/kitarp29/k8s-api)](https://hub.docker.com/repository/docker/kitarp29/k8s-api)
+# **Kube-ez**
+[![GitHub contributors](https://img.shields.io/github/contributors/kitarp29/kube-ez)](https://github.com/GDSC-DSI/Schedura/graphs/contributors) [![GitHub issues](https://img.shields.io/github/issues/HAC-2020/Aimers)](https://github.com/kitarp29/kube-ez/issues/) 
+[![Docker](https://img.shields.io/docker/pulls/kitarp29/kube-ez)](https://hub.docker.com/repository/docker/kitarp29/kube-ez)
+[![Docker](https://img.shields.io/docker/stars/kitarp29/kube-ez)](https://hub.docker.com/repository/docker/kitarp29/kube-ez)
 ![Follow](https://img.shields.io/twitter/follow/kitarp29?label=Follow+Kitarp29&style=social)
 
 <img src="golang.jpeg"></img>
 
 ##  <u>**Introduction**</u> 👋🏻
 
-This is a simple k8s-api project. It is built on **Golang** and utilizes the **client-go** library to interact with Kubernetes Cluster.
-It is a plug-and-play solution and can be used to create a k8s-api server. In three easy steps, you will have a simple API to interact with your cluster.
-The aim is to build a simple k8s-api server that can be used to interact with any Kubernetes cluster.
+.It is built on **Golang** and utilizes the **client-go** library to interact with Kubernetes Cluster.
+It is a plug-and-play solution and can be used to create a kube-ez server. In three easy steps, you will have a simple API to interact with your cluster.
+The aim is to build a simple API server that can be used to interact with any Kubernetes cluster.
 
  In my industrial experience, I have realized that **Kubernetes** is a very powerful tool but, only used by a handful of developers in the organization. The problem is not grasping the concept of the cluster. My last Product Manager was much more versed in AWS than I am. 
 I feel the reason is that there is no easier way to interact with it.
 This project will provide a bunch of API endpoints to perform various functions on the cluster. For now, I will have the Postman collections and API docs to achieve it, plan is to build a Dashboard on the API later.
 
 **Docker Image: [kitarp29/k8s-api](https://hub.docker.com/repository/docker/kitarp29/k8s-api)**
-> Use the Docker image with tag 2.0 or above to run the k8s-api server.
+> Use the Docker image with tag 2.0 or above to run the kube-ez server.
 <hr>
 
 ## <u>**Getting started**</u> ▶️
@@ -37,9 +37,9 @@ The project can be run *inside* the cluster and from *outside* the cluster. We w
       name: <Your-Custom-Name>
     EOF
     ```
-  Or you can apply the [YAML file](https://raw.githubusercontent.com/kitarp29/k8s-api/main/yamls/sa.yaml) using:
+  Or you can apply the [YAML file](https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/sa.yaml) using:
   ```
-  kubectl apply -f https://raw.githubusercontent.com/kitarp29/k8s-api/main/yamls/sa.yaml
+  kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/sa.yaml
   ```
    > We can also use the *default* service account. But it is not recommended.
   
@@ -71,10 +71,10 @@ The project can be run *inside* the cluster and from *outside* the cluster. We w
   EOF
   ```
 
-  Or you can apply the [YAML](https://raw.githubusercontent.com/kitarp29/k8s-api/main/yamls/crb.yaml) file using:
+  Or you can apply the [YAML](https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/crb.yaml) file using:
 
   ```
-  kubectl apply -f https://raw.githubusercontent.com/kitarp29/k8s-api/main/yamls/crb.yaml
+  kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/crb.yaml
   ```
 
 - ## **Deploying the Pod**
@@ -96,10 +96,10 @@ The project can be run *inside* the cluster and from *outside* the cluster. We w
       - containerPort: 8000
   EOF
   ```
-  or you can apply the [YAML](https://raw.githubusercontent.com/kitarp29/k8s-api/main/yamls/pod.yaml) file using:
+  or you can apply the [YAML](https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/pod.yaml) file using:
 
   ```
-  kubectl apply -f https://raw.githubusercontent.com/kitarp29/k8s-api/main/yamls/pod.yaml
+  kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/pod.yaml
   ```
 - ## **Port-forward**:
   
@@ -129,7 +129,7 @@ The project can be run *inside* the cluster and from *outside* the cluster. We w
 
 ##  <u>**API Docs**</u> 📖
 
-  There are multiple endpoints in the API. You can find all the endpoints in the [API Docs](https://github.com/kitarp29/k8s-api/blob/main/API_DOCS.md)
+  There are multiple endpoints in the API. You can find all the endpoints in the [API Docs](https://github.com/kitarp29/kube-ez/blob/main/API_DOCS.md)
 
   Moreover you can find the **Postman Collections** [Here](https://www.getpostman.com/collections/b14cdaad336ab81340b5) 📮
 
@@ -138,7 +138,7 @@ The project can be run *inside* the cluster and from *outside* the cluster. We w
   ## <u>**Contributors Guide**</u> 🥰
   
  Thanks for considering to contribute to the project. If you have any questions, please feel free to contact me at [Twitter](https://twitter.com/kitarp29).
-  The Contributors Guide is available [Here](https://github.com/kitarp29/k8s-api/blob/main/CONTRIBUTING.md) 📖
+  The Contributors Guide is available [Here](https://github.com/kitarp29/kube-ez/blob/main/CONTRIBUTING.md) 📖
 
   <hr>
 

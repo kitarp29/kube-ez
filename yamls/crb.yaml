@@ -1,11 +1,11 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: k8s-api
+  name: kube-ez
 subjects:
 - kind: ServiceAccount
-  name: k8s-api # name of your service account
-  namespace: dev # this is the namespace your service account is in
+  name: kube-ez # name of your service account
+  namespace: default # this is the namespace your service account is in
 roleRef: # referring to your ClusterRole
   kind: ClusterRole
   name: cluster-admin # or the custom role you created in the last step

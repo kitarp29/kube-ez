@@ -1,4 +1,4 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: k8s-api #Or Your custom Name
+  name: kube-ez #Or Your custom Name

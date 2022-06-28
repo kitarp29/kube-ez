@@ -3,7 +3,7 @@ name: 'go-mod-tidy'
 on:
   push:
     branches:
-      - 'master'
+      - 'main'
     paths:
       - 'go.mod'
       - 'go.sum'

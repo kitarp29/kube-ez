@@ -15,9 +15,9 @@ on:
 
 env:
   # Use docker.io for Docker Hub if empty
-  REGISTRY: https://hub.docker.com/
-  # github.repository as 
-  IMAGE_NAME: ${{ kitarp29/k8s-api }}
+  REGISTRY: ghcr.io
+  # github.repository as 	  # github.repository as <account>/<repo>
+  IMAGE_NAME: ${{ github.repository }}
 
 
 jobs:

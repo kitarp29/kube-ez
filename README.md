@@ -1,7 +1,7 @@
 # **Kube-ez**
 [![GitHub contributors](https://img.shields.io/github/contributors/kitarp29/kube-ez)](https://github.com/GDSC-DSI/Schedura/graphs/contributors) [![GitHub issues](https://img.shields.io/github/issues/HAC-2020/Aimers)](https://github.com/kitarp29/kube-ez/issues/) 
-[![Docker](https://img.shields.io/docker/pulls/kitarp29/kube-ez)](https://hub.docker.com/repository/docker/kitarp29/kube-ez)
-[![Docker](https://img.shields.io/docker/stars/kitarp29/kube-ez)](https://hub.docker.com/repository/docker/kitarp29/kube-ez)
+[![Docker](https://img.shields.io/docker/pulls/kitarp29/k8s-api)](https://hub.docker.com/repository/docker/kitarp29/k8s-api)
+[![Docker](https://img.shields.io/docker/stars/kitarp29/k8s-api)](https://hub.docker.com/repository/docker/kitarp29/k8s-api)
 ![Follow](https://img.shields.io/twitter/follow/kitarp29?label=Follow+Kitarp29&style=social)
 
 <img src="golang.jpeg"></img>

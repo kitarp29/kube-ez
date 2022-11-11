@@ -26,7 +26,7 @@ I am glad you are here. Hoping that you liked the project.
 ## 💬**How to run the project locally**
 1. Run the following command:
     ```
-    $ git clone
+    $ git clone https://github.com/kitarp29/kube-ez.git
     $ cd kube-ez
     ```
 2. Make sure you have **Golang** installed on your system.

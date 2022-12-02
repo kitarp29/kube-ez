@@ -109,7 +109,7 @@ The project can be run *inside* the cluster and from *outside* the cluster. We w
   ```
   kubectl port-forward <your-pod-name> 8000:8000
   ```
-> API will be running at <a href="localhost:8000/"> localohost:8000 </a> now.
+> API will be running at <a href="localhost:8000/"> localhost:8000 </a> now.
   ## **The project is up and running🔥!**
   <hr>
 
@@ -137,7 +137,7 @@ The project can be run *inside* the cluster and from *outside* the cluster. We w
 
   ## <u>**Contributors Guide**</u> 🥰
   
- Thanks for considering to contribute to the project. If you have any questions, please feel free to contact me at [Twitter](https://twitter.com/kitarp29).
+ Thanks for considering contributing to the project. If you have any questions, please feel free to contact me at [Twitter](https://twitter.com/kitarp29).
   The Contributors Guide is available [Here](https://github.com/kitarp29/kube-ez/blob/main/CONTRIBUTING.md) 📖
 
   <hr>
@@ -160,5 +160,5 @@ The project can be run *inside* the cluster and from *outside* the cluster. We w
 
 
 
-### Thanks for the interest in my API :)
+### Thanks for your interest in my API :)
 <hr>

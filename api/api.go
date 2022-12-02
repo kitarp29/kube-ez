@@ -7,14 +7,16 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
-//setting a Global variable for the clientset so that I can resuse throughout the code
+// setting a Global variable for the clientset so that I can resuse throughout the code
 var Kconfig *kubernetes.Clientset
 
 // These are all the Structs that are used in the API later in this code
@@ -101,41 +103,43 @@ func Main() {
 
 	// This will be used in case you have to run the code outside the cluster
 	// You will have to export the KUBECONFIG variable to point to the config file in the terminal
-	// kubeconfig := os.Getenv("KUBECONFIG")
-	// config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
-	// if err != nil {
-	// 	rest.InClusterConfig()
-	// 	fmt.Printf("erorr %s building config from env\n" + err.Error())
-	// 	config, err = rest.InClusterConfig()
-	// 	if err != nil {
-	// 		fmt.Printf("error %s, getting inclusterconfig" + err.Error())
-	// 		log.Print(err.Error())
-	// 		log.Panic(err.Error())
-	// 	}
-	// } else {
-	// 	log.Print("Successfully built config")
-	// }
-	// // Create the clientset
-	// clientset, err := kubernetes.NewForConfig(config)
-	// if err != nil {
-	// 	fmt.Println(err.Error())
-	// 	log.Print(err.Error())
-	// 	log.Panic(err.Error())
-	// } else {
-	// 	log.Print("Successfully built clientset")
-	// }
+	kubeconfig := os.Getenv("KUBECONFIG")
+	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+	if err != nil {
+		rest.InClusterConfig()
+		fmt.Printf("erorr %s building config from env\n" + err.Error())
+		config, err = rest.InClusterConfig()
+		if err != nil {
+			fmt.Printf("error %s, getting inclusterconfig" + err.Error())
+			log.Print(err.Error())
+			log.Panic(err.Error())
+		}
+	} else {
+		log.Print("Successfully built config")
+	}
+	// Create the clientset
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		fmt.Println(err.Error())
+		log.Print(err.Error())
+		log.Panic(err.Error())
+	} else {
+		log.Print("Successfully built clientset")
+	}
 
 	// uncomment this if you want to learn this file inside the cluster
 	// the file above this has to be run inside the cluster
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		log.Panic(err.Error())
-	}
+	// This will be used in case you have to run the code inside the cluster
+	// config, err := rest.InClusterConfig()
+	// if err != nil {
+	// 	log.Panic(err.Error())
+	// }
 
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		log.Panic(err.Error())
-	}
+	// clientset, err := kubernetes.NewForConfig(config)
+	// if err != nil {
+	// 	log.Panic(err.Error())
+	// }
+	// comment till here
 
 	Kconfig = clientset
 }

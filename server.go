@@ -1,29 +1,61 @@
 package main
 
 import (
+	"fmt"
 	api "k8-api/api"
 	apply "k8-api/apply"
 	"k8-api/install"
 	"net/http"
+	"runtime"
 
+	"github.com/distribution/distribution/v3/uuid"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
 
 	e := echo.New()
-	// Middleware
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+
+	log := logrus.New()
+
+	//ctx:= context.Context
+	log.SetReportCaller(true)
+	log.Formatter = &logrus.JSONFormatter{
+		CallerPrettyfier: func(f *runtime.Frame) (string, string) {
+			return fmt.Sprintf("%s()", f.Function), fmt.Sprintf("%s:%d", f.File, f.Line)
+		},
+	}
+
+	// Middleware"
+	//e.Use(uuidMiddleware())
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			c.Set("uuid", "kube-ez-"+uuid.Generate().String()[:8])
+			//log.Println(c.Get("uuid"))
+			cc := c
+			return next(cc)
+		}
+	})
+
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: `{"level":"INFO","time":"${time_rfc3339_nano}","id":"${id}","remote_ip":"${remote_ip}",` +
+			`"host":"${host}","method":"${method}","uri":"${uri}","user_agent":"${user_agent}",` +
+			`"status":${status},"error":"${error}","latency":${latency},"latency_human":"${latency_human}"` +
+			`,"bytes_in":${bytes_in},"bytes_out":${bytes_out}}` + "\n",
+		CustomTimeFormat: "2006-01-02 15:04:05",
+	}))
 	api.Main()
 	//CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE},
 	}))
+
 	// Root route => handler
 	e.GET("/", func(c echo.Context) error {
+		log.WithFields(logrus.Fields{"uuid": c.Get("uuid")}).Info("GET /")
 		return c.String(http.StatusOK, "Yes! I am alive!\n")
 	})
 

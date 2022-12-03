@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -101,7 +100,7 @@ type Event struct {
 // 2. We can configure it to be used outside the cluster
 
 func Main() {
-	log.Print("Shared Informer app started")
+	logrus.Info("Shared Informer app started")
 
 	// This will be used in case you have to run the code outside the cluster
 	// You will have to export the KUBECONFIG variable to point to the config file in the terminal
@@ -109,24 +108,21 @@ func Main() {
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		rest.InClusterConfig()
-		fmt.Printf("erorr %s building config from env\n" + err.Error())
+		logrus.Error("erorr %s building config from env\n" + err.Error())
 		config, err = rest.InClusterConfig()
 		if err != nil {
-			fmt.Printf("error %s, getting inclusterconfig" + err.Error())
-			log.Print(err.Error())
-			log.Panic(err.Error())
+			logrus.Error("error %s, getting inclusterconfig" + err.Error())
+			logrus.Error(err.Error())
 		}
 	} else {
-		log.Print("Successfully built config")
+		logrus.Info("Successfully built config")
 	}
 	// Create the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		fmt.Println(err.Error())
-		log.Print(err.Error())
-		log.Panic(err.Error())
+		logrus.Error(err.Error())
 	} else {
-		log.Print("Successfully built clientset")
+		logrus.Info("Successfully built clientset")
 	}
 
 	// uncomment this if you want to learn this file inside the cluster
@@ -134,12 +130,12 @@ func Main() {
 	// This will be used in case you have to run the code inside the cluster
 	// config, err := rest.InClusterConfig()
 	// if err != nil {
-	// 	log.Panic(err.Error())
+	// 	logrus.Error(err.Error())
 	// }
 
 	// clientset, err := kubernetes.NewForConfig(config)
 	// if err != nil {
-	// 	log.Panic(err.Error())
+	// 	logrus.Error(err.Error())
 	// }
 	// comment till here
 

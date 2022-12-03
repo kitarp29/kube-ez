@@ -170,48 +170,64 @@ func main() {
 	e.DELETE("/deleteHelm", func(c echo.Context) error {
 		namespace := c.FormValue("namespace")
 		name := c.FormValue("name")
-		return c.String(http.StatusOK, install.DeleteChart(name, namespace))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Delete Helm intitiated")
+		return c.String(http.StatusOK, install.DeleteChart(name, namespace, l))
 	})
 
 	e.DELETE("/deleteNamespace", func(c echo.Context) error {
 		namespace := c.FormValue("namespace")
-		return c.String(http.StatusOK, api.DeleteNamespace(namespace))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Deleting Namespace intitiated")
+		return c.String(http.StatusOK, api.DeleteNamespace(namespace, l))
 	})
 
 	e.DELETE("/deleteDeployment", func(c echo.Context) error {
 		namespace := c.FormValue("namespace")
 		deployment := c.FormValue("deployment")
-		return c.String(http.StatusOK, api.DeleteDeployment(namespace, deployment))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Delete Deployment intitiated")
+		return c.String(http.StatusOK, api.DeleteDeployment(namespace, deployment, l))
 	})
 
 	e.DELETE("/deleteService", func(c echo.Context) error {
 		namespace := c.FormValue("namespace")
 		service := c.FormValue("service")
-		return c.String(http.StatusOK, api.DeleteService(namespace, service))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Delete Service intitiated")
+		return c.String(http.StatusOK, api.DeleteService(namespace, service, l))
 	})
 
 	e.DELETE("/deleteConfigMap", func(c echo.Context) error {
 		namespace := c.FormValue("namespace")
 		configMap := c.FormValue("configMap")
-		return c.String(http.StatusOK, api.DeleteConfigMap(namespace, configMap))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Delete Configmap intitiated")
+		return c.String(http.StatusOK, api.DeleteConfigMap(namespace, configMap, l))
 	})
 
 	e.DELETE("/deleteSecret", func(c echo.Context) error {
 		namespace := c.FormValue("namespace")
 		secret := c.FormValue("secret")
-		return c.String(http.StatusOK, api.DeleteSecret(namespace, secret))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Delete Secret intitiated")
+		return c.String(http.StatusOK, api.DeleteSecret(namespace, secret, l))
 	})
 
 	e.DELETE("/deleteReplicationController", func(c echo.Context) error {
 		namespace := c.FormValue("namespace")
 		replicationController := c.FormValue("replicationController")
-		return c.String(http.StatusOK, api.DeleteReplicationController(namespace, replicationController))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Delete ReplicationControlller intitiated")
+		return c.String(http.StatusOK, api.DeleteReplicationController(namespace, replicationController, l))
 	})
 
 	e.DELETE("/deleteDaemonSet", func(c echo.Context) error {
 		namespace := c.FormValue("namespace")
 		daemonSet := c.FormValue("daemonSet")
-		return c.String(http.StatusOK, api.DeleteDaemonSet(namespace, daemonSet))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Delete Daemonset intitiated")
+		return c.String(http.StatusOK, api.DeleteDaemonSet(namespace, daemonSet, l))
 	})
 
 	e.DELETE("/deletePod", func(c echo.Context) error {
@@ -223,12 +239,16 @@ func main() {
 	e.DELETE("/deleteEvent", func(c echo.Context) error {
 		namespace := c.FormValue("namespace")
 		event := c.FormValue("event")
-		return c.String(http.StatusOK, api.DeleteEvent(namespace, event))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Delete Event intitiated")
+		return c.String(http.StatusOK, api.DeleteEvent(namespace, event, l))
 	})
 
 	e.DELETE("/deleteAll", func(c echo.Context) error {
 		namespace := c.FormValue("namespace")
-		return c.String(http.StatusOK, api.DeleteAll(namespace))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Delete All intitiated")
+		return c.String(http.StatusOK, api.DeleteAll(namespace, l))
 	})
 
 	// Run Server

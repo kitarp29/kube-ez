@@ -30,14 +30,13 @@ import (
 var settings *cli.EnvSettings = cli.New()
 
 // RepoAdd adds repo with given name and url
-func RepoAdd(name, url string) string {
+func RepoAdd(name, url string, log *logrus.Entry) string {
 	repoFile := settings.RepositoryConfig
 
 	//Ensure the file directory exists as it is required for file locking
 	err := os.MkdirAll(filepath.Dir(repoFile), os.ModePerm)
 	if err != nil && !os.IsExist(err) {
-		log.Print(err.Error())
-		log.Fatal(err)
+		log.Error(err.Error())
 	}
 
 	// Acquire a file lock for process synchronization
@@ -49,29 +48,26 @@ func RepoAdd(name, url string) string {
 	if err == nil && locked {
 		defer func() {
 			if err := fileLock.Unlock(); err != nil {
-				log.Println(err)
+				log.Error(err.Error())
 			}
 		}()
 	}
 	if err != nil {
-		log.Print(err.Error())
-		log.Fatal(err)
+		log.Error(err.Error())
 	}
 
 	b, err := ioutil.ReadFile(repoFile)
 	if err != nil && !os.IsNotExist(err) {
-		log.Print(err.Error())
-		log.Fatal(err)
+		log.Error(err.Error())
 	}
 
 	var f repo.File
 	if err := yaml.Unmarshal(b, &f); err != nil {
-		log.Print(err.Error())
-		log.Fatal(err)
+		log.Error(err.Error())
 	}
 
 	if f.Has(name) {
-		fmt.Printf("repository name (%s) already exists\n", name)
+		log.Info("repository name (%s) already exists\n", name)
 		return "repository name already exists"
 	}
 
@@ -82,23 +78,20 @@ func RepoAdd(name, url string) string {
 
 	r, err := repo.NewChartRepository(&c, getter.All(settings))
 	if err != nil {
-		log.Print(err.Error())
-		log.Fatal(err)
+		log.Error(err.Error())
 	}
 
 	if _, err := r.DownloadIndexFile(); err != nil {
 		err := errors.Wrapf(err, "looks like %q is not a valid chart repository or cannot be reached", url)
-		log.Print(err.Error())
-		log.Fatal(err)
+		log.Error(err.Error())
 	}
 
 	f.Update(&c)
 
 	if err := f.WriteFile(repoFile, 0644); err != nil {
-		log.Print(err.Error())
-		log.Fatal(err)
+		log.Error(err.Error())
 	}
-	fmt.Printf("%q has been added to your repositories\n", name)
+	log.Info("%q has been added to your repositories\n", name)
 	return "Repo added"
 }
 
@@ -143,11 +136,11 @@ func RepoUpdate(log *logrus.Entry) string {
 }
 
 // InstallChart
-func InstallChart(name, repo, chart, namespace string) string {
+func InstallChart(name, repo, chart, namespace string, log *logrus.Entry) string {
 	os.Setenv("HELM_NAMESPACE", namespace)
 	actionConfig := new(action.Configuration)
 	if err := actionConfig.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), debug); err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 	client := action.NewInstall(actionConfig)
@@ -159,7 +152,7 @@ func InstallChart(name, repo, chart, namespace string) string {
 	client.ReleaseName = name
 	cp, err := client.ChartPathOptions.LocateChart(fmt.Sprintf("%s/%s", repo, chart), settings)
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 
@@ -169,7 +162,7 @@ func InstallChart(name, repo, chart, namespace string) string {
 	valueOpts := &values.Options{}
 	vals, err := valueOpts.MergeValues(p)
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 
@@ -181,13 +174,13 @@ func InstallChart(name, repo, chart, namespace string) string {
 	// Check chart dependencies to make sure all are present in /charts
 	chartRequested, err := loader.Load(cp)
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 
 	validInstallableChart, err := isChartInstallable(chartRequested)
 	if !validInstallableChart {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 
@@ -207,12 +200,10 @@ func InstallChart(name, repo, chart, namespace string) string {
 					RepositoryCache:  settings.RepositoryCache,
 				}
 				if err := man.Update(); err != nil {
-					log.Print(err.Error())
-					log.Fatal(err)
+					log.Error(err.Error())
 				}
 			} else {
-				log.Print(err.Error())
-				log.Fatal(err)
+				log.Error(err.Error())
 			}
 		}
 	}
@@ -220,10 +211,10 @@ func InstallChart(name, repo, chart, namespace string) string {
 	client.Namespace = settings.Namespace()
 	release, err := client.Run(chartRequested, vals)
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
-	fmt.Println(release.Manifest)
+	log.Info(release.Manifest)
 	return "Chart installed"
 }
 

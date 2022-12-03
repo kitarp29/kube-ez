@@ -138,7 +138,9 @@ func main() {
 	e.POST("/helmRepoAdd", func(c echo.Context) error {
 		url := c.QueryParam("url")
 		repoName := c.QueryParam("repoName")
-		return c.String(http.StatusOK, install.RepoAdd(repoName, url))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Adding Helm Repo intitiated")
+		return c.String(http.StatusOK, install.RepoAdd(repoName, url, l))
 	})
 
 	e.POST("/helmInstall", func(c echo.Context) error {
@@ -146,17 +148,23 @@ func main() {
 		chartName := c.QueryParam("chartName")
 		name := c.QueryParam("name")
 		repo := c.QueryParam("repo")
-		return c.String(http.StatusOK, install.InstallChart(namespace, chartName, name, repo))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Adding Helm Install intitiated")
+		return c.String(http.StatusOK, install.InstallChart(namespace, chartName, name, repo, l))
 	})
 
 	e.POST("/createNamespace", func(c echo.Context) error {
 		namespace := c.FormValue("namespace")
-		return c.String(http.StatusOK, api.CreateNamespace(namespace))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Creating Namespace intitiated")
+		return c.String(http.StatusOK, api.CreateNamespace(namespace, l))
 	})
 
 	e.POST("/applyFile", func(c echo.Context) error {
 		filepath := c.FormValue("filepath")
-		return c.String(http.StatusOK, apply.Main(filepath))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Intiating File appliying")
+		return c.String(http.StatusOK, apply.Main(filepath, l))
 	})
 
 	e.DELETE("/deleteHelm", func(c echo.Context) error {

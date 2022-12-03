@@ -506,8 +506,8 @@ func NameSpace(log *logrus.Entry) string {
 }
 
 // This function creates Namespace in the cluster
-func CreateNamespace(namespace string) string {
-	fmt.Println(namespace)
+func CreateNamespace(namespace string, log *logrus.Entry) string {
+	log.Info("Namespace=" + namespace)
 	clientset := Kconfig
 	ns := &v1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
@@ -519,7 +519,7 @@ func CreateNamespace(namespace string) string {
 	}
 	_, err := clientset.CoreV1().Namespaces().Create(context.Background(), ns, metav1.CreateOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 	return "Namespace: " + namespace + " Created!"

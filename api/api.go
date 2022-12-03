@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"io"
 	"log"
-	"os"
 
 	"github.com/sirupsen/logrus"
 
@@ -14,7 +13,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 // setting a Global variable for the clientset so that I can resuse throughout the code
@@ -104,39 +102,39 @@ func Main() {
 
 	// This will be used in case you have to run the code outside the cluster
 	// You will have to export the KUBECONFIG variable to point to the config file in the terminal
-	kubeconfig := os.Getenv("KUBECONFIG")
-	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
-	if err != nil {
-		rest.InClusterConfig()
-		logrus.Error("erorr %s building config from env\n" + err.Error())
-		config, err = rest.InClusterConfig()
-		if err != nil {
-			logrus.Error("error %s, getting inclusterconfig" + err.Error())
-			logrus.Error(err.Error())
-		}
-	} else {
-		logrus.Info("Successfully built config")
-	}
-	// Create the clientset
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		logrus.Error(err.Error())
-	} else {
-		logrus.Info("Successfully built clientset")
-	}
+	// kubeconfig := os.Getenv("KUBECONFIG")
+	// config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+	// if err != nil {
+	// 	rest.InClusterConfig()
+	// 	logrus.Error("erorr %s building config from env\n" + err.Error())
+	// 	config, err = rest.InClusterConfig()
+	// 	if err != nil {
+	// 		logrus.Error("error %s, getting inclusterconfig" + err.Error())
+	// 		logrus.Error(err.Error())
+	// 	}
+	// } else {
+	// 	logrus.Info("Successfully built config")
+	// }
+	// // Create the clientset
+	// clientset, err := kubernetes.NewForConfig(config)
+	// if err != nil {
+	// 	logrus.Error(err.Error())
+	// } else {
+	// 	logrus.Info("Successfully built clientset")
+	// }
 
 	// uncomment this if you want to learn this file inside the cluster
 	// the file above this has to be run inside the cluster
 	// This will be used in case you have to run the code inside the cluster
-	// config, err := rest.InClusterConfig()
-	// if err != nil {
-	// 	logrus.Error(err.Error())
-	// }
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		logrus.Error(err.Error())
+	}
 
-	// clientset, err := kubernetes.NewForConfig(config)
-	// if err != nil {
-	// 	logrus.Error(err.Error())
-	// }
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		logrus.Error(err.Error())
+	}
 	// comment till here
 
 	Kconfig = clientset

@@ -234,17 +234,17 @@ func debug(format string, v ...interface{}) {
 	}
 }
 
-func DeleteChart(name, namespace string) string {
+func DeleteChart(name, namespace string, log *logrus.Entry) string {
 	os.Setenv("HELM_NAMESPACE", namespace)
 	actionConfig := new(action.Configuration)
 	if err := actionConfig.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), debug); err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 	client := action.NewUninstall(actionConfig)
 	res, err := client.Run(name)
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 	return res.Info

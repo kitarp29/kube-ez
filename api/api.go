@@ -522,83 +522,91 @@ func CreateNamespace(namespace string, log *logrus.Entry) string {
 		log.Error(err.Error())
 		return err.Error()
 	}
+	log.Info("Namespace" + namespace + "successfully")
 	return "Namespace: " + namespace + " Created!"
 }
 
 // This function deletes Namespace in the cluster
-func DeleteNamespace(namespace string) string {
+func DeleteNamespace(namespace string, log *logrus.Entry) string {
 	clientset := Kconfig
 	err := clientset.CoreV1().Namespaces().Delete(context.Background(), namespace, metav1.DeleteOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
+	log.Info("Namespace: " + namespace + " Deleted!")
 	return "Namespace: " + namespace + " Deleted!"
 }
 
 // This function Deletes the Deployments
-func DeleteDeployment(namespace string, deployment string) string {
+func DeleteDeployment(namespace string, deployment string, log *logrus.Entry) string {
 	clientset := Kconfig
 	err := clientset.AppsV1().Deployments(namespace).Delete(context.Background(), deployment, metav1.DeleteOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
+	log.Info("Deployment: " + deployment + " Deleted!")
 	return "Deployment: " + deployment + " Deleted!"
 }
 
 // This function Deletes the services
-func DeleteService(namespace string, service string) string {
+func DeleteService(namespace string, service string, log *logrus.Entry) string {
 	clientset := Kconfig
 	err := clientset.CoreV1().Services(namespace).Delete(context.Background(), service, metav1.DeleteOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
+	log.Info("Service: " + service + " Deleted!")
 	return "Service: " + service + " Deleted!"
 }
 
 // This function Deletes the ConfigMap
-func DeleteConfigMap(namespace string, configmap string) string {
+func DeleteConfigMap(namespace string, configmap string, log *logrus.Entry) string {
 	clientset := Kconfig
 	err := clientset.CoreV1().ConfigMaps(namespace).Delete(context.Background(), configmap, metav1.DeleteOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
+	log.Info("ConfigMap: " + configmap + " Deleted!")
 	return "ConfigMap: " + configmap + " Deleted!"
 }
 
 // This function Deletes the Secrets
-func DeleteSecret(namespace string, secret string) string {
+func DeleteSecret(namespace string, secret string, log *logrus.Entry) string {
 	clientset := Kconfig
 	err := clientset.CoreV1().Secrets(namespace).Delete(context.Background(), secret, metav1.DeleteOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
+	log.Info("Secret: " + secret + " Deleted!")
 	return "Secret: " + secret + " Deleted!"
 }
 
 // This function Deletes the ReplicationController
-func DeleteReplicationController(namespace string, replicationcontroller string) string {
+func DeleteReplicationController(namespace string, replicationcontroller string, log *logrus.Entry) string {
 	clientset := Kconfig
 	err := clientset.CoreV1().ReplicationControllers(namespace).Delete(context.Background(), replicationcontroller, metav1.DeleteOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
+	log.Info("ReplicationController: " + replicationcontroller + " Deleted!")
 	return "ReplicationController: " + replicationcontroller + " Deleted!"
 }
 
 // This function Deletes the DaemonSet
-func DeleteDaemonSet(namespace string, daemonset string) string {
+func DeleteDaemonSet(namespace string, daemonset string, log *logrus.Entry) string {
 	clientset := Kconfig
 	err := clientset.ExtensionsV1beta1().DaemonSets(namespace).Delete(context.Background(), daemonset, metav1.DeleteOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
+	log.Info("DaemonSet: " + daemonset + " Deleted!")
 	return "DaemonSet: " + daemonset + " Deleted!"
 }
 
@@ -614,64 +622,65 @@ func DeletePod(namespace string, pod string) string {
 }
 
 // This function Deletes the Event
-func DeleteEvent(namespace string, event string) string {
+func DeleteEvent(namespace string, event string, log *logrus.Entry) string {
 	clientset := Kconfig
 	err := clientset.CoreV1().Events(namespace).Delete(context.Background(), event, metav1.DeleteOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
+	log.Info("Event: " + event + " Deleted!")
 	return "Event: " + event + " Deleted!"
 }
 
 // This function Deletes EVERYTHING in the namespace. My lil nuke!! MUWAHAHAHA
-func DeleteAll(namespace string) string {
+func DeleteAll(namespace string, log *logrus.Entry) string {
 	clientset := Kconfig
 	deployments, err := clientset.AppsV1().Deployments(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 	for i := 0; i < len(deployments.Items); i++ {
 		err := clientset.AppsV1().Deployments(namespace).Delete(context.Background(), deployments.Items[i].Name, metav1.DeleteOptions{})
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			return err.Error()
 		}
 	}
 	services, err := clientset.CoreV1().Services(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 	for i := 0; i < len(services.Items); i++ {
 		err := clientset.CoreV1().Services(namespace).Delete(context.Background(), services.Items[i].Name, metav1.DeleteOptions{})
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			return err.Error()
 		}
 	}
 	configmaps, err := clientset.CoreV1().ConfigMaps(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 	for i := 0; i < len(configmaps.Items); i++ {
 		err := clientset.CoreV1().ConfigMaps(namespace).Delete(context.Background(), configmaps.Items[i].Name, metav1.DeleteOptions{})
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			return err.Error()
 		}
 	}
 	secrets, err := clientset.CoreV1().Secrets(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 	for i := 0; i < len(secrets.Items); i++ {
 		err := clientset.CoreV1().Secrets(namespace).Delete(context.Background(), secrets.Items[i].Name, metav1.DeleteOptions{})
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			return err.Error()
 		}
 	}
@@ -683,45 +692,46 @@ func DeleteAll(namespace string) string {
 	for i := 0; i < len(replicationcontrollers.Items); i++ {
 		err := clientset.CoreV1().ReplicationControllers(namespace).Delete(context.Background(), replicationcontrollers.Items[i].Name, metav1.DeleteOptions{})
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			return err.Error()
 		}
 	}
 	daemonsets, err := clientset.ExtensionsV1beta1().DaemonSets(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 	for i := 0; i < len(daemonsets.Items); i++ {
 		err := clientset.ExtensionsV1beta1().DaemonSets(namespace).Delete(context.Background(), daemonsets.Items[i].Name, metav1.DeleteOptions{})
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			return err.Error()
 		}
 	}
 	pods, err := clientset.CoreV1().Pods(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 	for i := 0; i < len(pods.Items); i++ {
 		err := clientset.CoreV1().Pods(namespace).Delete(context.Background(), pods.Items[i].Name, metav1.DeleteOptions{})
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			return err.Error()
 		}
 	}
 	events, err := clientset.CoreV1().Events(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 	for i := 0; i < len(events.Items); i++ {
 		err := clientset.CoreV1().Events(namespace).Delete(context.Background(), events.Items[i].Name, metav1.DeleteOptions{})
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			return err.Error()
 		}
 	}
+	log.Info("Everything in " + namespace + " Deleted!")
 	return "All Deleted!"
 }

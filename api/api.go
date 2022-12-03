@@ -4,17 +4,20 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
+	"os"
+
+	"github.com/sirupsen/logrus"
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
-//setting a Global variable for the clientset so that I can resuse throughout the code
+// setting a Global variable for the clientset so that I can resuse throughout the code
 var Kconfig *kubernetes.Clientset
 
 // These are all the Structs that are used in the API later in this code
@@ -97,55 +100,56 @@ type Event struct {
 // 2. We can configure it to be used outside the cluster
 
 func Main() {
-	log.Print("Shared Informer app started")
+	logrus.Info("Shared Informer app started")
 
 	// This will be used in case you have to run the code outside the cluster
 	// You will have to export the KUBECONFIG variable to point to the config file in the terminal
-	// kubeconfig := os.Getenv("KUBECONFIG")
-	// config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
-	// if err != nil {
-	// 	rest.InClusterConfig()
-	// 	fmt.Printf("erorr %s building config from env\n" + err.Error())
-	// 	config, err = rest.InClusterConfig()
-	// 	if err != nil {
-	// 		fmt.Printf("error %s, getting inclusterconfig" + err.Error())
-	// 		log.Print(err.Error())
-	// 		log.Panic(err.Error())
-	// 	}
-	// } else {
-	// 	log.Print("Successfully built config")
-	// }
-	// // Create the clientset
-	// clientset, err := kubernetes.NewForConfig(config)
-	// if err != nil {
-	// 	fmt.Println(err.Error())
-	// 	log.Print(err.Error())
-	// 	log.Panic(err.Error())
-	// } else {
-	// 	log.Print("Successfully built clientset")
-	// }
+	kubeconfig := os.Getenv("KUBECONFIG")
+	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+	if err != nil {
+		rest.InClusterConfig()
+		logrus.Error("erorr %s building config from env\n" + err.Error())
+		config, err = rest.InClusterConfig()
+		if err != nil {
+			logrus.Error("error %s, getting inclusterconfig" + err.Error())
+			logrus.Error(err.Error())
+		}
+	} else {
+		logrus.Info("Successfully built config")
+	}
+	// Create the clientset
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		logrus.Error(err.Error())
+	} else {
+		logrus.Info("Successfully built clientset")
+	}
 
 	// uncomment this if you want to learn this file inside the cluster
 	// the file above this has to be run inside the cluster
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		log.Panic(err.Error())
-	}
+	// This will be used in case you have to run the code inside the cluster
+	// config, err := rest.InClusterConfig()
+	// if err != nil {
+	// 	logrus.Error(err.Error())
+	// }
 
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		log.Panic(err.Error())
-	}
+	// clientset, err := kubernetes.NewForConfig(config)
+	// if err != nil {
+	// 	logrus.Error(err.Error())
+	// }
+	// comment till here
 
 	Kconfig = clientset
 }
 
 // This function is used to get the list of all the pods in the cluster with container details
-func Pods(AgentNamespace string, ContainerDetails bool) string {
+func Pods(AgentNamespace string, ContainerDetails bool, log *logrus.Entry) string {
 	// for Pods
 	clientset := Kconfig
 
 	if AgentNamespace == "" {
+		log.Info("Namespace is empty")
+		log.Info("Namespace = default")
 		AgentNamespace = "default"
 	}
 
@@ -153,7 +157,7 @@ func Pods(AgentNamespace string, ContainerDetails bool) string {
 	var containerInfo []Container
 	pods, err := clientset.CoreV1().Pods(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		log.Panic(err.Error())
 	} else {
 		for i := 0; i < len(pods.Items); i++ {
@@ -188,22 +192,22 @@ func Pods(AgentNamespace string, ContainerDetails bool) string {
 
 		pods_json, err := json.Marshal(podInfo)
 		if err != nil {
-			log.Print(err.Error())
-			log.Fatal(err)
+			log.Error(err.Error())
 		}
 
 		return string(pods_json)
 	}
+	log.Error("Error in getting pods")
 	return "Error"
 }
 
 // This function is used to get the list of all the logs in a pod.
-func PodLogs(AgentNamespace string, PodName string) string {
+func PodLogs(AgentNamespace string, PodName string, log *logrus.Entry) string {
 	clientset := Kconfig
 	req := clientset.CoreV1().Pods(AgentNamespace).GetLogs(PodName, &(v1.PodLogOptions{}))
 	podLogs, err := req.Stream(context.Background())
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return "error in opening stream"
 	}
 	defer podLogs.Close()
@@ -211,6 +215,7 @@ func PodLogs(AgentNamespace string, PodName string) string {
 	buf := new(bytes.Buffer)
 	_, err = io.Copy(buf, podLogs)
 	if err != nil {
+		log.Error(err.Error())
 		return "error in copy information from podLogs to buf"
 	}
 	str := buf.String()
@@ -219,9 +224,11 @@ func PodLogs(AgentNamespace string, PodName string) string {
 }
 
 // This function is used to get the list of all the deployments in the cluster
-func Deployments(AgentNamespace string) string {
+func Deployments(AgentNamespace string, log *logrus.Entry) string {
 	clientset := Kconfig
 	if AgentNamespace == "" {
+		log.Info("Namespace is empty")
+		log.Info("Namespace = default")
 		AgentNamespace = "default"
 	}
 
@@ -229,7 +236,7 @@ func Deployments(AgentNamespace string) string {
 	var deploymentInfo []Deployment
 	deployments, err := clientset.AppsV1().Deployments(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		log.Panic(err.Error())
 	} else {
 
@@ -248,27 +255,30 @@ func Deployments(AgentNamespace string) string {
 
 		deployment_json, err := json.Marshal(deploymentInfo)
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			log.Fatal(err)
 		}
 
 		return string(deployment_json)
 	}
+	log.Error("Error in getting deployments")
 	return "Error"
 }
 
 // This function is used to get the list of all the Configmaps in the cluster
-func Configmaps(AgentNamespace string) string {
+func Configmaps(AgentNamespace string, log *logrus.Entry) string {
 	clientset := Kconfig
 
 	if AgentNamespace == "" {
+		log.Info("Namespace is empty")
+		log.Info("Namespace = default")
 		AgentNamespace = "default"
 	}
 
 	var configmapsInfo []Configmap
 	configmaps, err := clientset.CoreV1().ConfigMaps(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		log.Panic(err.Error())
 	} else {
 		for i := 0; i < len(configmaps.Items); i++ {
@@ -283,21 +293,24 @@ func Configmaps(AgentNamespace string) string {
 
 		return string(configmap_json)
 	}
+	log.Error("Error in getting configmaps")
 	return "Error"
 }
 
 // This function is used to get the list of all the Services in the cluster
-func Services(AgentNamespace string) string {
+func Services(AgentNamespace string, log *logrus.Entry) string {
 	clientset := Kconfig
 
 	if AgentNamespace == "" {
+		log.Info("Namespace is empty")
+		log.Info("Namespace = default")
 		AgentNamespace = "default"
 	}
 	var servicesInfo []Service
 
 	services, err := clientset.CoreV1().Services(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		log.Panic(err.Error())
 	} else {
 		for i := 0; i < len(services.Items); i++ {
@@ -305,26 +318,29 @@ func Services(AgentNamespace string) string {
 		}
 		service_json, err := json.Marshal(servicesInfo)
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			log.Fatal(err)
 		}
 		//fmt.Println(string(pods_json))
 		return string(service_json)
 	}
+	log.Error("Error in getting services")
 	return "Error"
 }
 
 // This function is used to get the list of all the events in the cluster
-func Events(AgentNamespace string) string {
+func Events(AgentNamespace string, log *logrus.Entry) string {
 	clientset := Kconfig
 
 	var eventsInfo []Event
 	if AgentNamespace == "" {
+		log.Info("Namespace is empty")
+		log.Info("Namespace = default")
 		AgentNamespace = "default"
 	}
 	events, err := clientset.CoreV1().Events(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		log.Panic(err.Error())
 	} else {
 		for i := 0; i < len(events.Items); i++ {
@@ -339,24 +355,27 @@ func Events(AgentNamespace string) string {
 		}
 		event_json, err := json.Marshal(eventsInfo)
 		if err != nil {
-			log.Print(err.Error())
-			log.Fatal(err)
+			log.Error(err.Error())
+			log.Panic(err)
 		}
 		//fmt.Println(string(pods_json))
 		return string(event_json)
 	}
+	log.Error("Error in getting events")
 	return "Error"
 }
 
 // This function is used to get the list of all the secrets in the cluster
-func Secrets(AgentNamespace string) string {
+func Secrets(AgentNamespace string, log *logrus.Entry) string {
 	clientset := Kconfig
 	if AgentNamespace == "" {
+		log.Info("Namespace is empty")
+		log.Info("Namespace = default")
 		AgentNamespace = "default"
 	}
 	secrets, err := clientset.CoreV1().Secrets(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		log.Panic(err.Error())
 	} else {
 		var secretInfo []Secret
@@ -376,24 +395,27 @@ func Secrets(AgentNamespace string) string {
 		}
 		secret_json, err := json.Marshal(secretInfo)
 		if err != nil {
-			log.Print(err.Error())
-			log.Fatal(err)
+			log.Error(err.Error())
+			log.Panic(err)
 		}
 		//fmt.Println(string(secret_json))
 		return string(secret_json)
 	}
+	log.Error("Error in getting secrets")
 	return "Error"
 }
 
 // This function is used to get the list of all the ReplicaController in the cluster
-func ReplicationController(AgentNamespace string) string {
+func ReplicationController(AgentNamespace string, log *logrus.Entry) string {
 	clientset := Kconfig
 	if AgentNamespace == "" {
+		log.Info("Namespace is empty")
+		log.Info("Namespace = default")
 		AgentNamespace = "default"
 	}
 	replicationcontrollers, err := clientset.CoreV1().ReplicationControllers(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		log.Panic(err.Error())
 	} else {
 		var replicationcontrollerInfo []Replicationcontroller
@@ -408,25 +430,27 @@ func ReplicationController(AgentNamespace string) string {
 		}
 		replicationcontroller_json, err := json.Marshal(replicationcontrollerInfo)
 		if err != nil {
-			log.Print(err.Error())
-			log.Fatal(err)
+			log.Error(err.Error())
+			log.Panic(err)
 		}
 		//fmt.Println(string(replicationcontroller_json))
 		return string(replicationcontroller_json)
 	}
+	log.Error("Error in getting replicationcontrollers")
 	return "Error"
 }
 
 // This function is used to get the list of all the Daemonsets in the cluster
-func DaemonSet(AgentNamespace string) string {
+func DaemonSet(AgentNamespace string, log *logrus.Entry) string {
 	clientset := Kconfig
 	if AgentNamespace == "" {
+		log.Info("Namespace is empty")
+		log.Info("Namespace = default")
 		AgentNamespace = "default"
 	}
 	daemonsets, err := clientset.ExtensionsV1beta1().DaemonSets(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
-		log.Panic(err.Error())
+		log.Error(err.Error())
 	} else {
 		var daemonsetInfo []Daemonset
 		for i := 0; i < len(daemonsets.Items); i++ {
@@ -440,21 +464,21 @@ func DaemonSet(AgentNamespace string) string {
 		}
 		daemonset_json, err := json.Marshal(daemonsetInfo)
 		if err != nil {
-			log.Print(err.Error())
-			log.Panic(err)
+			log.Error(err.Error())
 		}
 		//fmt.Println(string(daemonset_json))
 		return string(daemonset_json)
 	}
+	log.Error("Error in getting daemonsets")
 	return "Error"
 }
 
 // This function is used to get the list of all the Namespaces in the cluster
-func NameSpace() string {
+func NameSpace(log *logrus.Entry) string {
 	clientset := Kconfig
 	namespaces, err := clientset.CoreV1().Namespaces().List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		log.Panic(err.Error())
 	} else {
 		var namespaceInfo []Namespace
@@ -468,17 +492,18 @@ func NameSpace() string {
 		}
 		namespace_json, err := json.Marshal(namespaceInfo)
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			log.Fatal(err)
 		}
 		return string(namespace_json)
 	}
+	log.Error("Error in getting namespaces")
 	return "Error"
 }
 
 // This function creates Namespace in the cluster
-func CreateNamespace(namespace string) string {
-	fmt.Println(namespace)
+func CreateNamespace(namespace string, log *logrus.Entry) string {
+	log.Info("Namespace=" + namespace)
 	clientset := Kconfig
 	ns := &v1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
@@ -490,86 +515,94 @@ func CreateNamespace(namespace string) string {
 	}
 	_, err := clientset.CoreV1().Namespaces().Create(context.Background(), ns, metav1.CreateOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
+	log.Info("Namespace" + namespace + "successfully")
 	return "Namespace: " + namespace + " Created!"
 }
 
 // This function deletes Namespace in the cluster
-func DeleteNamespace(namespace string) string {
+func DeleteNamespace(namespace string, log *logrus.Entry) string {
 	clientset := Kconfig
 	err := clientset.CoreV1().Namespaces().Delete(context.Background(), namespace, metav1.DeleteOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
+	log.Info("Namespace: " + namespace + " Deleted!")
 	return "Namespace: " + namespace + " Deleted!"
 }
 
 // This function Deletes the Deployments
-func DeleteDeployment(namespace string, deployment string) string {
+func DeleteDeployment(namespace string, deployment string, log *logrus.Entry) string {
 	clientset := Kconfig
 	err := clientset.AppsV1().Deployments(namespace).Delete(context.Background(), deployment, metav1.DeleteOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
+	log.Info("Deployment: " + deployment + " Deleted!")
 	return "Deployment: " + deployment + " Deleted!"
 }
 
 // This function Deletes the services
-func DeleteService(namespace string, service string) string {
+func DeleteService(namespace string, service string, log *logrus.Entry) string {
 	clientset := Kconfig
 	err := clientset.CoreV1().Services(namespace).Delete(context.Background(), service, metav1.DeleteOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
+	log.Info("Service: " + service + " Deleted!")
 	return "Service: " + service + " Deleted!"
 }
 
 // This function Deletes the ConfigMap
-func DeleteConfigMap(namespace string, configmap string) string {
+func DeleteConfigMap(namespace string, configmap string, log *logrus.Entry) string {
 	clientset := Kconfig
 	err := clientset.CoreV1().ConfigMaps(namespace).Delete(context.Background(), configmap, metav1.DeleteOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
+	log.Info("ConfigMap: " + configmap + " Deleted!")
 	return "ConfigMap: " + configmap + " Deleted!"
 }
 
 // This function Deletes the Secrets
-func DeleteSecret(namespace string, secret string) string {
+func DeleteSecret(namespace string, secret string, log *logrus.Entry) string {
 	clientset := Kconfig
 	err := clientset.CoreV1().Secrets(namespace).Delete(context.Background(), secret, metav1.DeleteOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
+	log.Info("Secret: " + secret + " Deleted!")
 	return "Secret: " + secret + " Deleted!"
 }
 
 // This function Deletes the ReplicationController
-func DeleteReplicationController(namespace string, replicationcontroller string) string {
+func DeleteReplicationController(namespace string, replicationcontroller string, log *logrus.Entry) string {
 	clientset := Kconfig
 	err := clientset.CoreV1().ReplicationControllers(namespace).Delete(context.Background(), replicationcontroller, metav1.DeleteOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
+	log.Info("ReplicationController: " + replicationcontroller + " Deleted!")
 	return "ReplicationController: " + replicationcontroller + " Deleted!"
 }
 
 // This function Deletes the DaemonSet
-func DeleteDaemonSet(namespace string, daemonset string) string {
+func DeleteDaemonSet(namespace string, daemonset string, log *logrus.Entry) string {
 	clientset := Kconfig
 	err := clientset.ExtensionsV1beta1().DaemonSets(namespace).Delete(context.Background(), daemonset, metav1.DeleteOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
+	log.Info("DaemonSet: " + daemonset + " Deleted!")
 	return "DaemonSet: " + daemonset + " Deleted!"
 }
 
@@ -585,64 +618,65 @@ func DeletePod(namespace string, pod string) string {
 }
 
 // This function Deletes the Event
-func DeleteEvent(namespace string, event string) string {
+func DeleteEvent(namespace string, event string, log *logrus.Entry) string {
 	clientset := Kconfig
 	err := clientset.CoreV1().Events(namespace).Delete(context.Background(), event, metav1.DeleteOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
+	log.Info("Event: " + event + " Deleted!")
 	return "Event: " + event + " Deleted!"
 }
 
 // This function Deletes EVERYTHING in the namespace. My lil nuke!! MUWAHAHAHA
-func DeleteAll(namespace string) string {
+func DeleteAll(namespace string, log *logrus.Entry) string {
 	clientset := Kconfig
 	deployments, err := clientset.AppsV1().Deployments(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 	for i := 0; i < len(deployments.Items); i++ {
 		err := clientset.AppsV1().Deployments(namespace).Delete(context.Background(), deployments.Items[i].Name, metav1.DeleteOptions{})
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			return err.Error()
 		}
 	}
 	services, err := clientset.CoreV1().Services(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 	for i := 0; i < len(services.Items); i++ {
 		err := clientset.CoreV1().Services(namespace).Delete(context.Background(), services.Items[i].Name, metav1.DeleteOptions{})
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			return err.Error()
 		}
 	}
 	configmaps, err := clientset.CoreV1().ConfigMaps(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 	for i := 0; i < len(configmaps.Items); i++ {
 		err := clientset.CoreV1().ConfigMaps(namespace).Delete(context.Background(), configmaps.Items[i].Name, metav1.DeleteOptions{})
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			return err.Error()
 		}
 	}
 	secrets, err := clientset.CoreV1().Secrets(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 	for i := 0; i < len(secrets.Items); i++ {
 		err := clientset.CoreV1().Secrets(namespace).Delete(context.Background(), secrets.Items[i].Name, metav1.DeleteOptions{})
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			return err.Error()
 		}
 	}
@@ -654,45 +688,46 @@ func DeleteAll(namespace string) string {
 	for i := 0; i < len(replicationcontrollers.Items); i++ {
 		err := clientset.CoreV1().ReplicationControllers(namespace).Delete(context.Background(), replicationcontrollers.Items[i].Name, metav1.DeleteOptions{})
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			return err.Error()
 		}
 	}
 	daemonsets, err := clientset.ExtensionsV1beta1().DaemonSets(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 	for i := 0; i < len(daemonsets.Items); i++ {
 		err := clientset.ExtensionsV1beta1().DaemonSets(namespace).Delete(context.Background(), daemonsets.Items[i].Name, metav1.DeleteOptions{})
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			return err.Error()
 		}
 	}
 	pods, err := clientset.CoreV1().Pods(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 	for i := 0; i < len(pods.Items); i++ {
 		err := clientset.CoreV1().Pods(namespace).Delete(context.Background(), pods.Items[i].Name, metav1.DeleteOptions{})
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			return err.Error()
 		}
 	}
 	events, err := clientset.CoreV1().Events(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return err.Error()
 	}
 	for i := 0; i < len(events.Items); i++ {
 		err := clientset.CoreV1().Events(namespace).Delete(context.Background(), events.Items[i].Name, metav1.DeleteOptions{})
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			return err.Error()
 		}
 	}
+	log.Info("Everything in " + namespace + " Deleted!")
 	return "All Deleted!"
 }

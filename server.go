@@ -33,7 +33,6 @@ func main() {
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			c.Set("uuid", "kube-ez-"+uuid.Generate().String()[:8])
-			//log.Println(c.Get("uuid"))
 			cc := c
 			return next(cc)
 		}
@@ -55,64 +54,85 @@ func main() {
 
 	// Root route => handler
 	e.GET("/", func(c echo.Context) error {
-		log.WithFields(logrus.Fields{"uuid": c.Get("uuid")}).Info("GET /")
 		return c.String(http.StatusOK, "Yes! I am alive!\n")
 	})
 
 	//route to get the Pods info in a namespace
 	e.GET("/pods", func(c echo.Context) error {
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Get pods intitiated")
 		namespace := c.QueryParam("namespace")
 		containerDetails := c.QueryParam("containerDetails") == "True" || c.QueryParam("containerDetails") == "true"
-		return c.String(http.StatusOK, api.Pods(namespace, containerDetails))
+		return c.String(http.StatusOK, api.Pods(namespace, containerDetails, l))
 	})
 
 	e.GET("/namespace", func(c echo.Context) error {
-		return c.String(http.StatusOK, api.NameSpace())
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Get Namespace intitiated")
+		return c.String(http.StatusOK, api.NameSpace(l))
 	})
 
 	e.GET("/deployments", func(c echo.Context) error {
 		namespace := c.QueryParam("namespace")
-		return c.String(http.StatusOK, api.Deployments(namespace))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Get Deployments intitiated")
+		return c.String(http.StatusOK, api.Deployments(namespace, l))
 	})
 
 	e.GET("/configmaps", func(c echo.Context) error {
 		namespace := c.QueryParam("namespace")
-		return c.String(http.StatusOK, api.Configmaps(namespace))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Get Configmaps intitiated")
+		return c.String(http.StatusOK, api.Configmaps(namespace, l))
 	})
 
 	e.GET("/services", func(c echo.Context) error {
 		namespace := c.QueryParam("namespace")
-		return c.String(http.StatusOK, api.Services(namespace))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Get Services intitiated")
+		return c.String(http.StatusOK, api.Services(namespace, l))
 	})
 
 	e.GET("/events", func(c echo.Context) error {
 		namespace := c.QueryParam("namespace")
-		return c.String(http.StatusOK, api.Events(namespace))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Get Events intitiated")
+		return c.String(http.StatusOK, api.Events(namespace, l))
 	})
 
 	e.GET("/secrets", func(c echo.Context) error {
 		namespace := c.QueryParam("namespace")
-		return c.String(http.StatusOK, api.Secrets(namespace))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Get Secrets intitiated")
+		return c.String(http.StatusOK, api.Secrets(namespace, l))
 	})
 
 	e.GET("/replicationController", func(c echo.Context) error {
 		namespace := c.QueryParam("namespace")
-		return c.String(http.StatusOK, api.ReplicationController(namespace))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Get RepilicationControllers intitiated")
+		return c.String(http.StatusOK, api.ReplicationController(namespace, l))
 	})
 
 	e.GET("/daemonset", func(c echo.Context) error {
 		namespace := c.QueryParam("namespace")
-		return c.String(http.StatusOK, api.DaemonSet(namespace))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Get Daemaonsets intitiated")
+		return c.String(http.StatusOK, api.DaemonSet(namespace, l))
 	})
 
 	e.GET("/podLogs", func(c echo.Context) error {
 		namespace := c.QueryParam("namespace")
 		pod := c.QueryParam("pod")
-		return c.String(http.StatusOK, api.PodLogs(namespace, pod))
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Get Pod's Logs intitiated")
+		return c.String(http.StatusOK, api.PodLogs(namespace, pod, l))
 	})
 
 	e.GET("/helmRepoUpdate", func(c echo.Context) error {
-		return c.String(http.StatusOK, install.RepoUpdate())
+		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
+		l.Info("Get Helm Repo updates intitiated")
+		return c.String(http.StatusOK, install.RepoUpdate(l))
 	})
 
 	e.POST("/helmRepoAdd", func(c echo.Context) error {

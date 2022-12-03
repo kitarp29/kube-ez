@@ -9,6 +9,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/sirupsen/logrus"
+
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -145,11 +147,13 @@ func Main() {
 }
 
 // This function is used to get the list of all the pods in the cluster with container details
-func Pods(AgentNamespace string, ContainerDetails bool) string {
+func Pods(AgentNamespace string, ContainerDetails bool, log *logrus.Entry) string {
 	// for Pods
 	clientset := Kconfig
 
 	if AgentNamespace == "" {
+		log.Info("Namespace is empty")
+		log.Info("Namespace = default")
 		AgentNamespace = "default"
 	}
 
@@ -157,7 +161,7 @@ func Pods(AgentNamespace string, ContainerDetails bool) string {
 	var containerInfo []Container
 	pods, err := clientset.CoreV1().Pods(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		log.Panic(err.Error())
 	} else {
 		for i := 0; i < len(pods.Items); i++ {
@@ -192,22 +196,22 @@ func Pods(AgentNamespace string, ContainerDetails bool) string {
 
 		pods_json, err := json.Marshal(podInfo)
 		if err != nil {
-			log.Print(err.Error())
-			log.Fatal(err)
+			log.Error(err.Error())
 		}
 
 		return string(pods_json)
 	}
+	log.Error("Error in getting pods")
 	return "Error"
 }
 
 // This function is used to get the list of all the logs in a pod.
-func PodLogs(AgentNamespace string, PodName string) string {
+func PodLogs(AgentNamespace string, PodName string, log *logrus.Entry) string {
 	clientset := Kconfig
 	req := clientset.CoreV1().Pods(AgentNamespace).GetLogs(PodName, &(v1.PodLogOptions{}))
 	podLogs, err := req.Stream(context.Background())
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		return "error in opening stream"
 	}
 	defer podLogs.Close()
@@ -215,6 +219,7 @@ func PodLogs(AgentNamespace string, PodName string) string {
 	buf := new(bytes.Buffer)
 	_, err = io.Copy(buf, podLogs)
 	if err != nil {
+		log.Error(err.Error())
 		return "error in copy information from podLogs to buf"
 	}
 	str := buf.String()
@@ -223,9 +228,11 @@ func PodLogs(AgentNamespace string, PodName string) string {
 }
 
 // This function is used to get the list of all the deployments in the cluster
-func Deployments(AgentNamespace string) string {
+func Deployments(AgentNamespace string, log *logrus.Entry) string {
 	clientset := Kconfig
 	if AgentNamespace == "" {
+		log.Info("Namespace is empty")
+		log.Info("Namespace = default")
 		AgentNamespace = "default"
 	}
 
@@ -233,7 +240,7 @@ func Deployments(AgentNamespace string) string {
 	var deploymentInfo []Deployment
 	deployments, err := clientset.AppsV1().Deployments(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		log.Panic(err.Error())
 	} else {
 
@@ -252,27 +259,30 @@ func Deployments(AgentNamespace string) string {
 
 		deployment_json, err := json.Marshal(deploymentInfo)
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			log.Fatal(err)
 		}
 
 		return string(deployment_json)
 	}
+	log.Error("Error in getting deployments")
 	return "Error"
 }
 
 // This function is used to get the list of all the Configmaps in the cluster
-func Configmaps(AgentNamespace string) string {
+func Configmaps(AgentNamespace string, log *logrus.Entry) string {
 	clientset := Kconfig
 
 	if AgentNamespace == "" {
+		log.Info("Namespace is empty")
+		log.Info("Namespace = default")
 		AgentNamespace = "default"
 	}
 
 	var configmapsInfo []Configmap
 	configmaps, err := clientset.CoreV1().ConfigMaps(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		log.Panic(err.Error())
 	} else {
 		for i := 0; i < len(configmaps.Items); i++ {
@@ -287,21 +297,24 @@ func Configmaps(AgentNamespace string) string {
 
 		return string(configmap_json)
 	}
+	log.Error("Error in getting configmaps")
 	return "Error"
 }
 
 // This function is used to get the list of all the Services in the cluster
-func Services(AgentNamespace string) string {
+func Services(AgentNamespace string, log *logrus.Entry) string {
 	clientset := Kconfig
 
 	if AgentNamespace == "" {
+		log.Info("Namespace is empty")
+		log.Info("Namespace = default")
 		AgentNamespace = "default"
 	}
 	var servicesInfo []Service
 
 	services, err := clientset.CoreV1().Services(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		log.Panic(err.Error())
 	} else {
 		for i := 0; i < len(services.Items); i++ {
@@ -309,26 +322,29 @@ func Services(AgentNamespace string) string {
 		}
 		service_json, err := json.Marshal(servicesInfo)
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			log.Fatal(err)
 		}
 		//fmt.Println(string(pods_json))
 		return string(service_json)
 	}
+	log.Error("Error in getting services")
 	return "Error"
 }
 
 // This function is used to get the list of all the events in the cluster
-func Events(AgentNamespace string) string {
+func Events(AgentNamespace string, log *logrus.Entry) string {
 	clientset := Kconfig
 
 	var eventsInfo []Event
 	if AgentNamespace == "" {
+		log.Info("Namespace is empty")
+		log.Info("Namespace = default")
 		AgentNamespace = "default"
 	}
 	events, err := clientset.CoreV1().Events(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		log.Panic(err.Error())
 	} else {
 		for i := 0; i < len(events.Items); i++ {
@@ -343,24 +359,27 @@ func Events(AgentNamespace string) string {
 		}
 		event_json, err := json.Marshal(eventsInfo)
 		if err != nil {
-			log.Print(err.Error())
-			log.Fatal(err)
+			log.Error(err.Error())
+			log.Panic(err)
 		}
 		//fmt.Println(string(pods_json))
 		return string(event_json)
 	}
+	log.Error("Error in getting events")
 	return "Error"
 }
 
 // This function is used to get the list of all the secrets in the cluster
-func Secrets(AgentNamespace string) string {
+func Secrets(AgentNamespace string, log *logrus.Entry) string {
 	clientset := Kconfig
 	if AgentNamespace == "" {
+		log.Info("Namespace is empty")
+		log.Info("Namespace = default")
 		AgentNamespace = "default"
 	}
 	secrets, err := clientset.CoreV1().Secrets(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		log.Panic(err.Error())
 	} else {
 		var secretInfo []Secret
@@ -380,24 +399,27 @@ func Secrets(AgentNamespace string) string {
 		}
 		secret_json, err := json.Marshal(secretInfo)
 		if err != nil {
-			log.Print(err.Error())
-			log.Fatal(err)
+			log.Error(err.Error())
+			log.Panic(err)
 		}
 		//fmt.Println(string(secret_json))
 		return string(secret_json)
 	}
+	log.Error("Error in getting secrets")
 	return "Error"
 }
 
 // This function is used to get the list of all the ReplicaController in the cluster
-func ReplicationController(AgentNamespace string) string {
+func ReplicationController(AgentNamespace string, log *logrus.Entry) string {
 	clientset := Kconfig
 	if AgentNamespace == "" {
+		log.Info("Namespace is empty")
+		log.Info("Namespace = default")
 		AgentNamespace = "default"
 	}
 	replicationcontrollers, err := clientset.CoreV1().ReplicationControllers(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		log.Panic(err.Error())
 	} else {
 		var replicationcontrollerInfo []Replicationcontroller
@@ -412,25 +434,27 @@ func ReplicationController(AgentNamespace string) string {
 		}
 		replicationcontroller_json, err := json.Marshal(replicationcontrollerInfo)
 		if err != nil {
-			log.Print(err.Error())
-			log.Fatal(err)
+			log.Error(err.Error())
+			log.Panic(err)
 		}
 		//fmt.Println(string(replicationcontroller_json))
 		return string(replicationcontroller_json)
 	}
+	log.Error("Error in getting replicationcontrollers")
 	return "Error"
 }
 
 // This function is used to get the list of all the Daemonsets in the cluster
-func DaemonSet(AgentNamespace string) string {
+func DaemonSet(AgentNamespace string, log *logrus.Entry) string {
 	clientset := Kconfig
 	if AgentNamespace == "" {
+		log.Info("Namespace is empty")
+		log.Info("Namespace = default")
 		AgentNamespace = "default"
 	}
 	daemonsets, err := clientset.ExtensionsV1beta1().DaemonSets(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
-		log.Panic(err.Error())
+		log.Error(err.Error())
 	} else {
 		var daemonsetInfo []Daemonset
 		for i := 0; i < len(daemonsets.Items); i++ {
@@ -444,21 +468,21 @@ func DaemonSet(AgentNamespace string) string {
 		}
 		daemonset_json, err := json.Marshal(daemonsetInfo)
 		if err != nil {
-			log.Print(err.Error())
-			log.Panic(err)
+			log.Error(err.Error())
 		}
 		//fmt.Println(string(daemonset_json))
 		return string(daemonset_json)
 	}
+	log.Error("Error in getting daemonsets")
 	return "Error"
 }
 
 // This function is used to get the list of all the Namespaces in the cluster
-func NameSpace() string {
+func NameSpace(log *logrus.Entry) string {
 	clientset := Kconfig
 	namespaces, err := clientset.CoreV1().Namespaces().List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Print(err.Error())
+		log.Error(err.Error())
 		log.Panic(err.Error())
 	} else {
 		var namespaceInfo []Namespace
@@ -472,11 +496,12 @@ func NameSpace() string {
 		}
 		namespace_json, err := json.Marshal(namespaceInfo)
 		if err != nil {
-			log.Print(err.Error())
+			log.Error(err.Error())
 			log.Fatal(err)
 		}
 		return string(namespace_json)
 	}
+	log.Error("Error in getting namespaces")
 	return "Error"
 }
 

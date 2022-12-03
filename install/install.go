@@ -15,6 +15,7 @@ import (
 
 	"github.com/gofrs/flock"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
@@ -102,42 +103,42 @@ func RepoAdd(name, url string) string {
 }
 
 // RepoUpdate updates charts for all helm repos
-func RepoUpdate() string {
+func RepoUpdate(log *logrus.Entry) string {
 	repoFile := settings.RepositoryConfig
 
 	f, err := repo.LoadFile(repoFile)
 	if os.IsNotExist(errors.Cause(err)) || len(f.Repositories) == 0 {
-		log.Print(err.Error())
-		log.Fatal(errors.New("no repositories found. You must add one before updating"))
+		log.Error(err.Error())
+		log.Panic(errors.New("no repositories found. You must add one before updating"))
 		return "no repositories found. You must add one before updating"
 	}
 	var repos []*repo.ChartRepository
 	for _, cfg := range f.Repositories {
 		r, err := repo.NewChartRepository(cfg, getter.All(settings))
 		if err != nil {
-			log.Print(err.Error())
-			log.Fatal(err)
+			log.Error(err.Error())
+			log.Panic(err)
 			return err.Error()
 		}
 		repos = append(repos, r)
 	}
 
-	fmt.Printf("Hang tight while we grab the latest from your chart repositories...\n")
+	log.Info("Hang tight while we grab the latest from your chart repositories...\n")
 	var wg sync.WaitGroup
 	for _, re := range repos {
 		wg.Add(1)
 		go func(re *repo.ChartRepository) {
 			defer wg.Done()
 			if _, err := re.DownloadIndexFile(); err != nil {
-				fmt.Printf("...Unable to get an update from the %q chart repository (%s):\n\t%s\n", re.Config.Name, re.Config.URL, err)
-				log.Print(err.Error())
+				log.Error("...Unable to get an update from the %q chart repository (%s):\n\t%s\n", re.Config.Name, re.Config.URL, err)
+				log.Error(err.Error())
 			} else {
-				fmt.Printf("...Successfully got an update from the %q chart repository\n", re.Config.Name)
+				log.Info("...Successfully got an update from the %q chart repository\n", re.Config.Name)
 			}
 		}(re)
 	}
 	wg.Wait()
-	fmt.Printf("Update Complete. ⎈ Happy Helming!⎈\n")
+	log.Info("Update Complete. ⎈ Happy Helming!⎈\n")
 	return "Update Complete. ⎈ Happy Helming!⎈"
 }
 

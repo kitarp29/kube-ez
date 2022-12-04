@@ -20,7 +20,7 @@ func main() {
 
 	log := logrus.New()
 
-	//ctx:= context.Context
+	//making the logs in JSON format
 	log.SetReportCaller(true)
 	log.Formatter = &logrus.JSONFormatter{
 		CallerPrettyfier: func(f *runtime.Frame) (string, string) {
@@ -28,8 +28,7 @@ func main() {
 		},
 	}
 
-	// Middleware"
-	//e.Use(uuidMiddleware())
+	// Middleware to add UUID to each request, helps us to track the request in case of any error
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			c.Set("uuid", "kube-ez-"+uuid.Generate().String()[:8])
@@ -38,6 +37,7 @@ func main() {
 		}
 	})
 
+	// Middleware to set the order of the log that is genererated
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: `{"level":"INFO","time":"${time_rfc3339_nano}","id":"${id}","remote_ip":"${remote_ip}",` +
 			`"host":"${host}","method":"${method}","uri":"${uri}","user_agent":"${user_agent}",` +
@@ -45,19 +45,21 @@ func main() {
 			`,"bytes_in":${bytes_in},"bytes_out":${bytes_out}}` + "\n",
 		CustomTimeFormat: "2006-01-02 15:04:05",
 	}))
+
+	// Calling the Main fucntion that connects with the kubernetes cluster
 	api.Main()
-	//CORS
+
+	//Middlewae to handle CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE},
 	}))
 
-	// Root route => handler
+	// All the routes are described this point forward
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Yes! I am alive!\n")
 	})
 
-	//route to get the Pods info in a namespace
 	e.GET("/pods", func(c echo.Context) error {
 		l := log.WithFields(logrus.Fields{"uuid": c.Get("uuid")})
 		l.Info("Get pods intitiated")

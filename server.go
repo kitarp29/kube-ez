@@ -12,12 +12,14 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/sirupsen/logrus"
+	"github.com/unrolled/secure"
 )
 
 func main() {
 
 	e := echo.New()
 
+	// Setting up Logging
 	log := logrus.New()
 
 	//making the logs in JSON format
@@ -27,6 +29,16 @@ func main() {
 			return fmt.Sprintf("%s()", f.Function), fmt.Sprintf("%s:%d", f.File, f.Line)
 		},
 	}
+
+	// Securing the API, customise as per your usage
+	// Add more options as per your need from Here: https://github.com/unrolled/secure#available-options
+	secureMiddleware := secure.New(secure.Options{
+		SSLRedirect: false,
+		SSLHost:     "localhost:8000", // Remove this if you are not using on localhost
+	})
+
+	// Middleware to secure the API
+	e.Use(echo.WrapMiddleware(secureMiddleware.Handler))
 
 	// Middleware to add UUID to each request, helps us to track the request in case of any error
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {

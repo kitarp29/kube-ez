@@ -34,7 +34,7 @@ func main() {
 	// Add more options as per your need from Here: https://github.com/unrolled/secure#available-options
 	secureMiddleware := secure.New(secure.Options{
 		SSLRedirect: false,
-		SSLHost:     "localhost:8000", // Remove this if you are not using on localhost
+		// SSLHost : "localhost" Remove this if you are not using on localhost
 	})
 
 	// Middleware to secure the API

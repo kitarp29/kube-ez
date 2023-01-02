@@ -91,7 +91,7 @@ The project can be run *inside* the cluster and from *outside* the cluster. We w
     serviceAccount: <Name-of-your-serviceaccount> 
     containers:
     - name: <your-custom-name>
-      image: kitarp29/k8s-api:5.0
+      image: kitarp29/k8s-api:6.0
       ports:
       - containerPort: 8000
   EOF

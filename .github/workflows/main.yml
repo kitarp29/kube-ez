@@ -121,7 +121,6 @@ jobs:
         run: |
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/sa.yaml
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/crb.yaml
-          kubectl run kube-ez --image=k8s-api:${{ github.sha }} --port=8000
           MAX_RETRIES=3
           RETRY_COUNT=0
 
@@ -134,6 +133,7 @@ jobs:
                   break
               else
                   echo "Pod is not ready, retrying in 5 seconds..."
+                  kubectl delete po kube-ez
                   sleep 5
                   RETRY_COUNT=$((RETRY_COUNT+1))
               fi

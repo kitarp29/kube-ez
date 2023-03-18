@@ -33,8 +33,7 @@ jobs:
         uses: paulvollmer/action-golang-gosum@v1.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: go mod tidy 
-      - run: echo go-mod-tidy ran without any errors :)
+      - run: go mod tidy
 
   build-binary:
     runs-on: ubuntu-latest
@@ -48,9 +47,6 @@ jobs:
 
     - name: Build
       run: go build -v ./... && echo Go Binary built
-
-    - name: Test
-      run: go test -v ./... && tested against all TCs 
   
   build-docker-image:
 
@@ -128,7 +124,7 @@ jobs:
           COSIGN_EXPERIMENTAL: "true"
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
-        run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }} && echo docker image - k8s-api:"${{ steps.meta.outputs.tags }}"
+        run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
 
 
 

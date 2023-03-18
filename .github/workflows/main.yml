@@ -118,7 +118,7 @@ jobs:
 
       - name: Load Image into KinD Cluster
         run: |
-          kind load docker-image k8s-api:${{ github.sha }}
+          kind load docker-image k8s-api
 
       - name : Preparing cluster for kube-ez
         run: |

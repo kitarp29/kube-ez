@@ -124,6 +124,7 @@ jobs:
           kubectl run kube-ez --image=k8s-api:${{ github.sha }} --port=8000
           sleep 20
           kubectl get po
+          kubectl describe po kube-ez
           kubectl port-forward kube-ez 8000:8000 &>/dev/null &  
       - run: |
           curl -s http://localhost:8000/

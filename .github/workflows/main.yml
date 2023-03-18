@@ -122,8 +122,9 @@ jobs:
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/sa.yaml
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/crb.yaml
           kubectl run kube-ez --image=k8s-api:${{ github.sha }} --port=8000
-          while [ "$(kubectl get pods -l app=kube-ez -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}')" != "True" ]; do sleep 1; done
-          kubectl get po
+          start_time=$(date +%s)
+          while [ "$(kubectl get pods -l app=kube-ez -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}')" != "True"  &&  $(date +%s) - start_time < 180 ]; do sleep 1; done
+          kubectl describe po/kube-ez
           kubectl port-forward kube-ez 8000:8000 &>/dev/null &  
       - run: |
           curl -s http://localhost:8000/

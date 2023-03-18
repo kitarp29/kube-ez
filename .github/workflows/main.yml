@@ -122,7 +122,26 @@ jobs:
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/sa.yaml
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/crb.yaml
           kubectl run kube-ez --image=k8s-api:${{ github.sha }} --port=8000
-          sleep 20
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+              # Start the pod here
+              kubectl create -f my-pod.yaml
+              
+              # Check if the pod is ready
+              if kubectl wait --for=condition=Ready pod/my-pod -n my-namespace --timeout=1m; then
+                  echo "Pod is ready!"
+                  break
+              else
+                  echo "Pod is not ready, retrying in 10 seconds..."
+                  sleep 10
+                  RETRY_COUNT=$((RETRY_COUNT+1))
+              fi
+          done
+          if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+              echo "Failed to start pod after $MAX_RETRIES retries."
+          fi
           kubectl get po
           kubectl describe po kube-ez
           kubectl port-forward kube-ez 8000:8000 &>/dev/null &  

@@ -110,14 +110,12 @@ jobs:
         uses: helm/kind-action@v1.4.0
       - run: |
           kubectl cluster-info
-          kubectl get pods -n kube-system
-          echo "current-context:" $(kubectl config current-context)
-          echo "environment-kubeconfig:" ${KUBECONFIG}
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/sa.yaml
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/crb.yaml
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/.github/workflows/pod/podtest.yaml
           sleep 20
           kubectl port-forward kube-ez 8000:8000
+      - run: 
           if [ "$(curl -s http://localhost:8000/)" = "Yes! I am alive!" ]
           then
             echo "It is good! works as expected :) "

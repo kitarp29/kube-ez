@@ -117,11 +117,6 @@ jobs:
       - run: |
           docker build . --file Dockerfile --tag k8s-api:${{ github.sha }}
 
-
-      - name: Load Image into KinD Cluster
-        run: |
-          kind load docker-image k8s-api:${{ github.sha }} --name=chart-testing-control-plane
-
       - name : Preparing cluster for kube-ez
         run: |
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/sa.yaml

@@ -113,12 +113,12 @@ jobs:
     
       - name: Build the Docker image
         uses: actions/checkout@v3
-      - run: docker build . --file Dockerfile --tag k8s-api:$(date +%s)
+      - run: docker build . --file Dockerfile --tag k8s-api:${{ github.sha }}
 
 
       - name: Load Image into KinD Cluster
         run: |
-          kind load docker-image k8s-api:$(date +%s)
+          kind load docker-image k8s-api:${{ github.sha }}
 
       - name : Preparing cluster for kube-ez
         run: |

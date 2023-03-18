@@ -103,17 +103,28 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-  create-cluster:
+  Test-on-cluster:
     runs-on: ubuntu-latest
     steps:
       - name: Testing on a k8s Kind Cluster
         uses: helm/kind-action@v1.4.0
       - run: |
           kubectl cluster-info
+
+      - name: Build Docker Image
+        run: |
+          docker build -t my-image:${{ github.sha }} .
+
+      - name: Load Image into KinD Cluster
+        run: |
+          kind load docker-image my-image:${{ github.sha }}
+
+      - name : Preparing cluster for kube-ez
+        run: |
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/sa.yaml
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/crb.yaml
-          kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/.github/workflows/pod/podtest.yaml
-          sleep 20
+          kubectl run kube-ez --image=my-docker-image:${{ github.sha }} --port=8000
+          while [ "$(kubectl get pods -l app=kube-ez -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}')" != "True" ]; do sleep 1; done
           kubectl get po
           kubectl port-forward kube-ez 8000:8000 &>/dev/null &  
       - run: |

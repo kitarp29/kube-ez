@@ -124,7 +124,7 @@ jobs:
         run: |
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/sa.yaml
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/crb.yaml
-          kubectl run kube-ez --image=k8s-api:$(date +%s) --port=8000
+          kubectl run kube-ez --image=k8s-api:${{ github.sha }} --port=8000
           while [ "$(kubectl get pods -l app=kube-ez -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}')" != "True" ]; do sleep 1; done
           kubectl get po
           kubectl port-forward kube-ez 8000:8000 &>/dev/null &  

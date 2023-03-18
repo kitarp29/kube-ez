@@ -106,7 +106,7 @@ jobs:
   create-cluster:
     runs-on: ubuntu-latest
     steps:
-      - name: Create k8s Kind Cluster
+      - name: Testing on a k8s Kind Cluster
         uses: helm/kind-action@v1.4.0
       - run: |
           kubectl cluster-info
@@ -115,7 +115,7 @@ jobs:
           echo "environment-kubeconfig:" ${KUBECONFIG}
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/sa.yaml
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/crb.yaml
-          kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/.github/workflows/pod/podtest.yml
+          https://raw.githubusercontent.com/kitarp29/kube-ez/main/.github/workflows/pod/podtest.yaml
           kubectl port-forward kube-ez 8000:8000
           if [ "$(curl -s http://localhost:8000/)" = "Yes! I am alive!" ]
           then

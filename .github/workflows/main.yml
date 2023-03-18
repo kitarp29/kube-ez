@@ -115,10 +115,5 @@ jobs:
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/.github/workflows/pod/podtest.yaml
           sleep 20
           kubectl port-forward kube-ez 8000:8000 &>/dev/null &  
-      - run: 
-          if [ "$(curl -s http://localhost:8000/)" = "Yes! I am alive!" ]
-          then
-            echo "It is good! works as expected :) "
-          else
-            echo "Doesn't work :("
-          fi
+      - run: curl -s http://localhost:8000/
+

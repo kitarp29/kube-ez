@@ -126,16 +126,15 @@ jobs:
           RETRY_COUNT=0
 
           while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-              # Start the pod here
-              kubectl create -f my-pod.yaml
+
+              kubectl run kube-ez --image=k8s-api:${{ github.sha }} --port=8000
               
-              # Check if the pod is ready
-              if kubectl wait --for=condition=Ready pod/my-pod -n my-namespace --timeout=1m; then
+              if kubectl wait --for=condition=Ready pod/kube-ez --timeout=1m; then
                   echo "Pod is ready!"
                   break
               else
-                  echo "Pod is not ready, retrying in 10 seconds..."
-                  sleep 10
+                  echo "Pod is not ready, retrying in 5 seconds..."
+                  sleep 5
                   RETRY_COUNT=$((RETRY_COUNT+1))
               fi
           done

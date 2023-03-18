@@ -103,13 +103,12 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-  kind:
+  create-cluster:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - uses: engineerd/setup-kind@v0.5.0
-      - name: Testing
-        run: |
+      - name: Create k8s Kind Cluster
+        uses: helm/kind-action@v1.4.0
+      - run: |
           kubectl cluster-info
           kubectl get pods -n kube-system
           echo "current-context:" $(kubectl config current-context)

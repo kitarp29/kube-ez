@@ -121,11 +121,8 @@ jobs:
         run: |
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/sa.yaml
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/crb.yaml
-          kubectl run kube-ez --image=k8s-api:${{ github.sha }} --port=8000
-          sleep 120
-          kubectl get po
-          kubectl describe po kube-ez
+          kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/.github/workflows/pod/podtest.yaml
+          sleep 20
           kubectl port-forward kube-ez 8000:8000 &>/dev/null &  
-      - run: |
-          curl -s http://localhost:8000/
+      - run: curl -s http://localhost:8000/
 

@@ -76,7 +76,7 @@ jobs:
         run: |
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/sa.yaml
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/crb.yaml
-          kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/.github/workflows/pod/podtest.yaml
+          kubectl run kube-ez --image=ghcr.io/${{ github.repository_owner }}/${{ env.DOCKER_IMAGE_NAME }}:${{ github.sha }} --port=8000
           sleep 20
           kubectl get po
           kubectl port-forward kube-ez 8000:8000 &>/dev/null &

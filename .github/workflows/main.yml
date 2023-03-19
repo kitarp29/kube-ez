@@ -125,5 +125,5 @@ jobs:
           kubectl describe po/kube-ez
           nohup kubectl port-forward kube-ez 8000:8000 >/dev/null 2>&1 &
       - run: |
-          curl -s http://localhost:8000/
+          curl -i http://localhost:8000/
 

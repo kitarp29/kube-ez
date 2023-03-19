@@ -1,4 +1,4 @@
-name: Main CI
+name: Kube-ez CI
 on:
   push:
   pull_request:
@@ -11,34 +11,6 @@ env:
   DOCKERFILE_PATH: ./Dockerfile
 
 jobs:
-  build-modules:
-    runs-on: ubuntu-latest
-    env:
-      GO111MODULE: on
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
-        with:
-          go-version: 1.19
-
-      - name: tidy
-        uses: paulvollmer/action-golang-gosum@v1.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: go mod tidy
-
-  build-binary:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.18
-
-    - name: Build
-      run: go build -v ./... && echo Go Binary built
   
   build-and-push:
     runs-on: ubuntu-latest
@@ -74,6 +46,7 @@ jobs:
           kubectl get nodes
 
       - name : Preparing cluster for kube-ez
+      # I know this is Wierd that it works, but running the forward command twice does work!
         run: |
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/sa.yaml
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/crb.yaml

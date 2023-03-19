@@ -122,8 +122,7 @@ jobs:
           kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/.github/workflows/pod/podtest.yaml
           sleep 20
           kubectl get po
-          kubectl describe po/kube-ez
-          nohup kubectl port-forward kube-ez 8000:8000 >/dev/null 2>&1 &
+          kubectl port-forward kube-ez 8000:8000 &>/dev/null &  
       - run: |
           curl -i http://localhost:8000/
 

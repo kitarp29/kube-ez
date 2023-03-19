@@ -1,0 +1,20 @@
+name: Building go binary
+on: 
+  push:
+  pull_request:
+  
+jobs:
+  build-binary:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.18
+
+    - name: Build
+      run: go build -v ./... && echo Go Binary built
+
+    ## Need to add the Test command here, when we have unit TCs

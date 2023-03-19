@@ -65,6 +65,7 @@ jobs:
          
   Test-on-cluster:
     runs-on: ubuntu-latest
+    needs: [build-and-push]
     steps:
       - name: Testing on a k8s Kind Cluster
         uses: helm/kind-action@v1.4.0

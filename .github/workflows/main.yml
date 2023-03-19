@@ -125,5 +125,6 @@ jobs:
           sleep 20
           kubectl describe po/kube-ez
           kubectl port-forward kube-ez 8000:8000 &>/dev/null &  
-      - run: curl -s http://localhost:8000/
+      - run: |
+          curl -s http://localhost:8000/
 

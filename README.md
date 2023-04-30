@@ -6,7 +6,7 @@
 
 <img src="golang.jpeg"></img>
 
-##  <u>**Introduction**</u> 👋🏻
+#  <u>**Introduction**</u> 👋🏻
 
 It is built on **Golang** and utilizes the **client-go** library to interact with Kubernetes Cluster.
 It is a plug-and-play solution and can be used to create a kube-ez server. In three easy steps, you will have a simple API to interact with your cluster.
@@ -20,101 +20,21 @@ This project will provide a bunch of API endpoints to perform various functions 
 > Use the Docker image with tag 2.0 or above to run the kube-ez server.
 <hr>
 
-## <u>**Getting started**</u> ▶️
+# <u>**Getting started**</u> ▶️
 
 To start using the project you need a Kubernetes Cluster and should have the right access to apply changes to the cluster.
-The project can be run *inside* the cluster and from *outside* the cluster. We will first discuss how to run the project from *inside* the cluster.
-## **Steps to follow** 🪜
-- ## **Service Account**:
+There are two ways to run this project.
+ ## 1. **Outside the Cluster**
+ ## 2. **Inside the Cluster**
 
-  We need to make a custom service account to be able to interact with the cluster. We will use this service account in our pod on which we will run the API.</br>
- Command to make a service account: </br>
-    ```
-    kubectl apply -f - <<EOF
-    apiVersion: v1
-    kind: ServiceAccount
-    metadata:
-      name: <Your-Custom-Name>
-    EOF
-    ```
-  Or you can apply the [YAML file](https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/sa.yaml) using:
-  ```
-  kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/sa.yaml
-  ```
-   > We can also use the *default* service account. But it is not recommended.
-  
-  > Verify the service account by running the following command: kubectl get serviceaccounts/Your-Custom-Name -o yaml
-- ## **Cluster Role**:
-  
-  We need to make a custom cluster role to be able to interact with the cluster. We will use this cluster role to bind to our **Service Account**. The role should have permission to all the resources in order for the project to run smoothly.
-  I would advise you not to make any role and use the *cluster-admin* role directly. Still, if you want to create a custom role, you can do so. [Here](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
-  </br>
+Steps to run the project are mentioned in the [INSTALL.md](https://github.com/kitarp29/kube-ez/blob/main/INSTALL.md)
 
-- ## **Cluster Role Binding**:
 
-  We will bind the **Service Account** to the **Cluster Role** we just created. To do so the commands needed are:
-
-  ```
-  kubectl apply -f - <<EOF
-  apiVersion: rbac.authorization.k8s.io/v1
-  kind: ClusterRoleBinding
-  metadata:
-    name: <your-custom-name>
-  subjects:
-  - kind: ServiceAccount
-    name: <Name-of-your-serviceaccount> 
-    namespace: default
-  roleRef:
-    kind: ClusterRole
-    name: cluster-admin
-    apiGroup: rbac.authorization.k8s.io
-  EOF
-  ```
-
-  Or you can apply the [YAML](https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/crb.yaml) file using:
-
-  ```
-  kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/crb.yaml
-  ```
-
-- ## **Deploying the Pod**
-
-  This is it! Now that we have the service account and the cluster role binding, we can deploy the pod. We can use this command to deploy the pod:
-
-  ```
-  kubectl apply -f - <<EOF 
-  apiVersion: v1
-  kind: Pod
-  metadata:
-    name: <your-custom-name>
-  spec:
-    serviceAccount: <Name-of-your-serviceaccount> 
-    containers:
-    - name: <your-custom-name>
-      image: kitarp29/k8s-api:8.0
-      ports:
-      - containerPort: 8000
-  EOF
-  ```
-  or you can apply the [YAML](https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/pod.yaml) file using:
-
-  ```
-  kubectl apply -f https://raw.githubusercontent.com/kitarp29/kube-ez/main/yamls/pod.yaml
-  ```
-- ## **Port-forward**:
-  
-  Now that we have the pod deployed, we can use the *port-forward* command to access the pod. Expose a port of the pod to the local machine.
-  To do so, we can use the following command:
-
-  ```
-  kubectl port-forward <your-pod-name> 8000:8000
-  ```
-> API will be running at <a href="localhost:8000/"> localhost:8000 </a> now.
-  ## **The project is up and running🔥!**
   <hr>
 
-##  <u>**Project Features**</u> 🤯
+#  <u>**Project Features**</u> 🤯
   -  Get details about any resource in the cluster.
+  -  It *detects* if you are trying to run the project inside or outside of a cluster.
   -  Create new resources in the cluster.
   -  Delete resources in the cluster.
   -  Run CLI commands using the API.
@@ -127,7 +47,7 @@ The project can be run *inside* the cluster and from *outside* the cluster. We w
 
 <hr>
 
-##  <u>**API Docs**</u> 📖
+#  <u>**API Docs**</u> 📖
 
   There are multiple endpoints in the API. You can find all the endpoints in the [API Docs](https://github.com/kitarp29/kube-ez/blob/main/API_DOCS.md)
 
@@ -135,20 +55,20 @@ The project can be run *inside* the cluster and from *outside* the cluster. We w
 
   <hr>
 
-  ## <u>**Contributors Guide**</u> 🥰
+  # <u>**Contributors Guide**</u> 🥰
   
  Thanks for considering contributing to the project. If you have any questions, please feel free to contact me at [Twitter](https://twitter.com/kitarp29).
   The Contributors Guide is available [Here](https://github.com/kitarp29/kube-ez/blob/main/CONTRIBUTING.md) 📖
 
   <hr>
 
-  ## <u>**License**</u> 🍻
+  # <u>**License**</u> 🍻
 
   This project is licensed under the **MIT license**. Feel free to use it and if you want to contribute, please feel free to fork the project and make a pull request. Thanks!
 
   <hr>
 
-  ## <u>**FAQ**</u> 🤔
+  # <u>**FAQ**</u> 🤔
 
   - **Is this a Unique Product?**
   

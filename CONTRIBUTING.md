@@ -3,6 +3,9 @@
 Thanks for contributing to the project!🥰
 I am glad you are here. Hoping that you liked the project.
 
+I have setup Codespaces to install and run a Kuberentes cluster for you. You could directly dive into contributing without worrying abut the local setup!
+![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/kitarp29/kube-ez)
+
 ##  🔥**Purpose of this file:**
  - I will be stating the rules for contributing to the project. 
  - Most important is that you should be able to run the project locally. 
@@ -45,23 +48,7 @@ I am glad you are here. Hoping that you liked the project.
    ```
    > This command will pull all the latest packages from the internet.
 
-5. Now, if you have run it **inside the container**, then follow the steps given in [README.md](https://github.com/kitarp29/kube-ez/blob/main/README.md)
-6. If you have to run it **outside the container**:
-    - Uncomment the code in api/api.go file from line 97 to 119
-    - Comment out the code in api/api..go from 123 to 131
-    - The comments are self-explaining.
-    - Export a variable called ```KUBECONFIG``` and set it to the path of the kube-ez kubeconfig file. (Usually ~/.kube/config)
-    - Run the following command:
-        ```
-        export KUBECONFIG=~/.kube/config
-        ```
-    - Now, run the following command:
-        ```
-        go run server.go
-        ```
-> Reason for these two ways of running the project:
-> The Client-go library needs a file that tells it where to find the kubeconfig file. If the code is inside the container, then the file is accessible. Outside the cluster, we need to explicitly export the KUBECONFIG variable.
-   
+5. Steps to run the project are mentioned in the [INSTALL.md](https://github.com/kitarp29/kube-ez/blob/main/INSTALL.md)
 
 ## 🐋 **Docker Image** [Link](https://hub.docker.com/repository/docker/kitarp29/k8s-api)
 It's a basic container based on the latest release of **Golang**. The tag *2.0* works well.

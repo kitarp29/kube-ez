@@ -101,16 +101,24 @@ func RepoUpdate(log *logrus.Entry) string {
 
 	f, err := repo.LoadFile(repoFile)
 	if os.IsNotExist(errors.Cause(err)) || len(f.Repositories) == 0 {
-		log.Error(err.Error())
-		log.Panic(errors.New("no repositories found. You must add one before updating"))
+		defer func() {
+			if r := recover(); r != nil {
+				log.Error("no repositories found. You must add one before updating)", r)
+			}
+		}()
+		log.Panic("no repositories found. You must add one before updating. Error: " + err.Error())
 		return "no repositories found. You must add one before updating"
 	}
 	var repos []*repo.ChartRepository
 	for _, cfg := range f.Repositories {
 		r, err := repo.NewChartRepository(cfg, getter.All(settings))
 		if err != nil {
-			log.Error(err.Error())
-			log.Panic(err)
+			defer func() {
+				if r := recover(); r != nil {
+					log.Error("Recovered in RepoUpdate()", r)
+				}
+			}()
+			log.Panic("Error: " + err.Error())
 			return err.Error()
 		}
 		repos = append(repos, r)

@@ -155,8 +155,12 @@ func Pods(AgentNamespace string, ContainerDetails bool, log *logrus.Entry) strin
 	var containerInfo []Container
 	pods, err := clientset.CoreV1().Pods(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Error(err.Error())
-		log.Panic(err.Error())
+		defer func() {
+			if r := recover(); r != nil {
+				log.Error("Recovered in Pods(): ", r)
+			}
+		}()
+		log.Panic("Unable to find pods. Error: " + err.Error())
 	} else {
 		for i := 0; i < len(pods.Items); i++ {
 
@@ -234,8 +238,12 @@ func Deployments(AgentNamespace string, log *logrus.Entry) string {
 	var deploymentInfo []Deployment
 	deployments, err := clientset.AppsV1().Deployments(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Error(err.Error())
-		log.Panic(err.Error())
+		defer func() {
+			if r := recover(); r != nil {
+				log.Error("Recovered in Deployments(): ", r)
+			}
+		}()
+		log.Panic("Unable to find Deployments. Error: " + err.Error())
 	} else {
 
 		for i := 0; i < len(deployments.Items); i++ {
@@ -276,8 +284,12 @@ func Configmaps(AgentNamespace string, log *logrus.Entry) string {
 	var configmapsInfo []Configmap
 	configmaps, err := clientset.CoreV1().ConfigMaps(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Error(err.Error())
-		log.Panic(err.Error())
+		defer func() {
+			if r := recover(); r != nil {
+				log.Error("Recovered in Configmaps(): ", r)
+			}
+		}()
+		log.Panic("Unable to find Configmaps. Error: " + err.Error())
 	} else {
 		for i := 0; i < len(configmaps.Items); i++ {
 			configmapsInfo = append(configmapsInfo, Configmap{configmaps.Items[i].Name})
@@ -308,8 +320,12 @@ func Services(AgentNamespace string, log *logrus.Entry) string {
 
 	services, err := clientset.CoreV1().Services(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Error(err.Error())
-		log.Panic(err.Error())
+		defer func() {
+			if r := recover(); r != nil {
+				log.Error("Recovered in Services()", r)
+			}
+		}()
+		log.Panic("Unable to find Services. Error: " + err.Error())
 	} else {
 		for i := 0; i < len(services.Items); i++ {
 			servicesInfo = append(servicesInfo, Service{Name: services.Items[i].Name, Ports: services.Items[i].Spec.Ports[0].TargetPort.String()})
@@ -338,8 +354,12 @@ func Events(AgentNamespace string, log *logrus.Entry) string {
 	}
 	events, err := clientset.CoreV1().Events(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Error(err.Error())
-		log.Panic(err.Error())
+		defer func() {
+			if r := recover(); r != nil {
+				log.Error("Recovered in Events()", r)
+			}
+		}()
+		log.Panic("Unable to find events. Error: " + err.Error())
 	} else {
 		for i := 0; i < len(events.Items); i++ {
 			eventsInfo = append(eventsInfo,
@@ -353,8 +373,12 @@ func Events(AgentNamespace string, log *logrus.Entry) string {
 		}
 		event_json, err := json.Marshal(eventsInfo)
 		if err != nil {
-			log.Error(err.Error())
-			log.Panic(err)
+			defer func() {
+				if r := recover(); r != nil {
+					log.Error("Recovered in Events()", r)
+				}
+			}()
+			log.Panic("Issue in marshaling JSON in Events. Error: " + err.Error())
 		}
 		//fmt.Println(string(pods_json))
 		return string(event_json)
@@ -373,8 +397,12 @@ func Secrets(AgentNamespace string, log *logrus.Entry) string {
 	}
 	secrets, err := clientset.CoreV1().Secrets(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Error(err.Error())
-		log.Panic(err.Error())
+		defer func() {
+			if r := recover(); r != nil {
+				log.Error("Recovered in Secrets()", r)
+			}
+		}()
+		log.Panic("Unable to find secrets. Error: " + err.Error())
 	} else {
 		var secretInfo []Secret
 		for i := 0; i < len(secrets.Items); i++ {
@@ -393,8 +421,12 @@ func Secrets(AgentNamespace string, log *logrus.Entry) string {
 		}
 		secret_json, err := json.Marshal(secretInfo)
 		if err != nil {
-			log.Error(err.Error())
-			log.Panic(err)
+			defer func() {
+				if r := recover(); r != nil {
+					log.Error("Recovered in Secrets()", r)
+				}
+			}()
+			log.Panic("Error in Marshalling JSON in Secrets. Error: " + err.Error())
 		}
 		//fmt.Println(string(secret_json))
 		return string(secret_json)
@@ -413,8 +445,12 @@ func ReplicationController(AgentNamespace string, log *logrus.Entry) string {
 	}
 	replicationcontrollers, err := clientset.CoreV1().ReplicationControllers(AgentNamespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Error(err.Error())
-		log.Panic(err.Error())
+		defer func() {
+			if r := recover(); r != nil {
+				log.Error("Recovered in ReplicaController()", r)
+			}
+		}()
+		log.Panic("Unable to find ReplicaControllers. Error: " + err.Error())
 	} else {
 		var replicationcontrollerInfo []Replicationcontroller
 		for i := 0; i < len(replicationcontrollers.Items); i++ {
@@ -428,8 +464,12 @@ func ReplicationController(AgentNamespace string, log *logrus.Entry) string {
 		}
 		replicationcontroller_json, err := json.Marshal(replicationcontrollerInfo)
 		if err != nil {
-			log.Error(err.Error())
-			log.Panic(err)
+			defer func() {
+				if r := recover(); r != nil {
+					log.Error("Recovered in ReplicaController()", r)
+				}
+			}()
+			log.Panic("Error in Marshalling JSON in ReplicaController. Error: " + err.Error())
 		}
 		//fmt.Println(string(replicationcontroller_json))
 		return string(replicationcontroller_json)
@@ -476,8 +516,12 @@ func NameSpace(log *logrus.Entry) string {
 	clientset := Kconfig
 	namespaces, err := clientset.CoreV1().Namespaces().List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Error(err.Error())
-		log.Panic(err.Error())
+		defer func() {
+			if r := recover(); r != nil {
+				log.Error("Recovered in NameSpace()", r)
+			}
+		}()
+		log.Panic("Unable to find namespaces. Error: " + err.Error())
 	} else {
 		var namespaceInfo []Namespace
 		for i := 0; i < len(namespaces.Items); i++ {

@@ -24,8 +24,8 @@ This project will provide a bunch of API endpoints to perform various functions 
 
 To start using the project you need a Kubernetes Cluster and should have the right access to apply changes to the cluster.
 There are two ways to run this project.
- ## 1. **Outside the Cluster**
- ## 2. **Inside the Cluster**
+  1. **Outside the Cluster**
+  2. **Inside the Cluster**
 
 Steps to run the project are mentioned in the [INSTALL.md](https://github.com/kitarp29/kube-ez/blob/main/INSTALL.md)
 

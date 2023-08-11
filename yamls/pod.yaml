@@ -11,3 +11,11 @@ spec:
     - containerPort: 8000
     securityContext:
       allowPrivilegeEscalation: false
+    livenessProbe:
+      initialDelaySeconds: 60
+      periodSeconds: 300
+      successThreshold: 1
+      failureThreshold: 3
+      httpGet:
+        path: /
+        port: 8000

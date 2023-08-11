@@ -6,6 +6,8 @@ spec:
   serviceAccount: kube-ez
   containers:
   - name: kube-ez
-    image: kitarp29/k8s-api:9.0
+    image: kitarp29/k8s-api:10
     ports:
     - containerPort: 8000
+    securityContext:
+      allowPrivilegeEscalation: false

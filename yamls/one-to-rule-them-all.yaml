@@ -26,7 +26,7 @@ spec:
   serviceAccount: kube-ez
   containers:
   - name: kube-ez
-    image: kitarp29/k8s-api:10
+    image: kitarp29/k8s-api:latest
     ports:
     - containerPort: 8000
     securityContext:

@@ -1,0 +1,5 @@
+# kube-ez-chart/Chart.yaml
+apiVersion: v2
+name: kube-ez-chart
+description: A Helm Chart for deploying kube-ez
+version: 0.1.0

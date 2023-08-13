@@ -1,0 +1,41 @@
+# One YAML to rule them all...One YAML to find them...One YAML to bring them all and in the darkness bind them
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kube-ez # Or Your custom Name
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kube-ez
+subjects:
+- kind: ServiceAccount
+  name: kube-ez # name of your service account
+  namespace: default # this is the namespace your service account is in
+roleRef: # referring to your ClusterRole
+  kind: ClusterRole
+  name: cluster-admin # or the custom role you created in the last step
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kube-ez
+spec:
+  serviceAccount: kube-ez
+  containers:
+  - name: kube-ez
+    image: kitarp29/k8s-api:10
+    ports:
+    - containerPort: 8000
+    securityContext:
+      allowPrivilegeEscalation: false
+    livenessProbe:
+      initialDelaySeconds: 60
+      periodSeconds: 300
+      successThreshold: 1
+      failureThreshold: 3
+      httpGet:
+        path: /
+        port: 8000

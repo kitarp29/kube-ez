@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kube-ez
+spec:
+  serviceAccount: kube-ez
+  containers:
+  - name: kube-ez
+    image: kitarp29/k8s-api:10
+    ports:
+    - containerPort: 8000
+    securityContext:
+      allowPrivilegeEscalation: false
+    livenessProbe:
+      initialDelaySeconds: 60
+      periodSeconds: 300
+      successThreshold: 1
+      failureThreshold: 3
+      httpGet:
+        path: /
+        port: 8000

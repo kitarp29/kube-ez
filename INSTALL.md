@@ -7,7 +7,9 @@ All you have to do after this is:
 - Clone the repo
 - Open a terminal in the dir
 - Run this: 
- ``` go mod tidy && go run k8-api```
+ ``` 
+ go mod tidy && go run k8-api
+ ```
 -  API will be running at <a href="localhost:8000/"> localhost:8000 </a> now.
 
   ### **The project is up and running🔥!**

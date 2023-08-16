@@ -76,7 +76,7 @@ Steps to run the project are mentioned in the [INSTALL.md](https://github.com/ki
   
   - **Purpose of this project?**
 
-     It's a pet project to learn *Kubernetes* and *Golang*. I wanted to build this to better understand these two technologies. I also explored *Docker*.
+     It's a pet project to learn *Kubernetes* and *Golang*. I wanted to build this to better understand these two technologies. I also explored *Docker*
 
 
 

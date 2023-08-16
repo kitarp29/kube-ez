@@ -1,12 +1,14 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	api "k8-api/api"
 	apply "k8-api/apply"
 	"k8-api/install"
 	"net/http"
 	"runtime"
+	"time"
 
 	"github.com/distribution/distribution/v3/uuid"
 	"github.com/labstack/echo"
@@ -14,6 +16,37 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/unrolled/secure"
 )
+
+func timeoutMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		start := time.Now()
+		err := next(c)
+		duration := time.Since(start)
+
+		if err != nil {
+			return err
+		}
+
+		if duration > 6*time.Second {
+			return echo.NewHTTPError(http.StatusRequestTimeout, "Request timed out")
+		}
+
+		return nil
+	}
+}
+
+func retryMax(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		for i := 0; i < 5; i++ {
+			err := next(c)
+			if err == nil {
+				return nil
+			}
+			time.Sleep(1 * time.Second)
+		}
+		return errors.New("Tried Multiple times, but failed. Time to restart the server!")
+	}
+}
 
 func main() {
 
@@ -58,6 +91,8 @@ func main() {
 		CustomTimeFormat: "2006-01-02 15:04:05",
 	}))
 
+	// These two middlewares are used to handle the timeout and retry the request
+	e.Use(timeoutMiddleware, retryMax)
 	// Calling the Main fucntion that connects with the kubernetes cluster
 	api.Main()
 

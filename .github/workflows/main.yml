@@ -1,9 +1,23 @@
 name: Kube-ez CI
 on:
   push:
+    paths:
+      - '/api/**'
+      - '/apply/**'
+      - '/install/**'
+      - 'kube-ez-chart/**'
+      - 'yamls/**'
+      - 'Dockerfile'
+      - '.github/**'
+      - '/server.go'
   pull_request:
+    paths:
+      - '**.go'
+      - 'Dockerfile'
+      - '.github/**'
+      - '**.yaml'
   workflow_dispatch:
-
+    
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io

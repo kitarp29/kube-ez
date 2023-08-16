@@ -113,6 +113,8 @@ func Main() {
 		config, err = rest.InClusterConfig()
 		if err != nil {
 			fmt.Printf("Error loading in-cluster configuration: %s\n", err)
+			// BUS YHI TKK THA JO THA!!
+			// So, at this point we tried to connect with local config file. Also tried to connect to one inside a cluster.
 			logrus.Error(err.Error())
 		}
 	}

@@ -18,24 +18,35 @@ roleRef: # referring to your ClusterRole
   name: cluster-admin # or the custom role you created in the last step
   apiGroup: rbac.authorization.k8s.io
 ---
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: kube-ez
 spec:
-  serviceAccount: kube-ez
-  containers:
-  - name: kube-ez
-    image: kitarp29/k8s-api:latest
-    ports:
-    - containerPort: 8000
-    securityContext:
-      allowPrivilegeEscalation: false
-    livenessProbe:
-      initialDelaySeconds: 60
-      periodSeconds: 300
-      successThreshold: 1
-      failureThreshold: 3
-      httpGet:
-        path: /
-        port: 8000
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kube-ez
+  template:
+    metadata:
+      labels:
+        app: kube-ez
+    spec:
+      serviceAccount: kube-ez
+      containers:
+      - name: kube-ez
+        image: kitarp29/k8s-api:10
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        securityContext:
+          allowPrivilegeEscalation: false
+        livenessProbe:
+          initialDelaySeconds: 60
+          periodSeconds: 300
+          successThreshold: 1
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 8000
+      restartPolicy: Always

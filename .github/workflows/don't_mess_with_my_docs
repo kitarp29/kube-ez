@@ -1,0 +1,26 @@
+name: Only I can do changes to the Docs
+
+on:
+  pull_request:
+    paths:
+      - '**/*.md' 
+jobs:
+  restrict_md_changes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check commit author
+        id: check_author
+        run: |
+          # Get the author of the latest commit
+          AUTHOR=$(git log -1 --pretty=format:'%an')
+
+          # List of allowed authors (replace with your own)
+          ALLOWED_AUTHORS="kitarp29"
+
+          # Check if the author is allowed
+          if [[ ! $ALLOWED_AUTHORS =~ (^| )$AUTHOR($| ) ]]; then
+            echo "Unauthorized commit by $AUTHOR. Only specific accounts are allowed."
+            echo "If you see a problem in the Docs, please raise an Issue"
+            exit 1
+          fi
